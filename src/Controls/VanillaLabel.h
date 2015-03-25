@@ -32,7 +32,7 @@ private:
 };
 
 
-VAPI(VanillaControl) VanillaLabelCreate(VanillaControl ParentControl, VanillaRect Rect, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled);
+VAPI(VanillaControl) VanillaLabelCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled);
 VAPI(VanillaVoid) VanillaLabelSetTitle(VanillaControl Control, VanillaText Title);
 VAPI(VanillaVoid) VanillaLabelSetStringFormat(VanillaControl Control, VanillaStringFormat StringFormat);
 VAPI(VanillaText) VanillaLabelGetTitle(VanillaControl Control);

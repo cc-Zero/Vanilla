@@ -4,7 +4,7 @@
 #include "VStruct.h"
 #include "VPort.h"
 #include "VDrawing.h"
-
+#include "VWindow.h"
 
 SkMaskFilter* VStringFormat::BlurMaskFilter = SkBlurMaskFilter::Create(SkBlurStyle::kOuter_SkBlurStyle, 3, SkBlurMaskFilter::BlurFlags::kNone_BlurFlag);
 
@@ -51,9 +51,9 @@ VAPI(SkTextBox*) VanillaCreateTextBox(VanillaGraphics Graphics, VanillaStringFor
 VAPI(VanillaVoid) VanillaDrawString(VanillaGraphics Graphics, VanillaStringFormat StringFormat, VanillaText String, VanillaRect Rect) {
 	VRectR RectD;
 	if (Rect == NULL) {
-		RectD = VRectR(0, 0, (VanillaReal)Graphics->Width, (VanillaReal)Graphics->Height);
+		MAKEVRECT(RectD, 0, 0, (VanillaReal)Graphics->Width, (VanillaReal)Graphics->Height);
 	} else {
-		RectD = VRectR((VanillaReal)Rect->Left, (VanillaReal)Rect->Top, (VanillaReal)Rect->Width - 1, (VanillaReal)Rect->Height);
+		MAKEVRECT(RectD, (VanillaReal)Rect->Left, (VanillaReal)Rect->Top, (VanillaReal)Rect->Width - 1, (VanillaReal)Rect->Height);
 	}
 	Graphics->Paint.reset();
 	Graphics->Paint.setTypeface(StringFormat->Typeface);
@@ -214,11 +214,70 @@ VAPI(VanillaGraphics) VanillaCreateGraphicsInMemory(VanillaInt Width, VanillaInt
 }
 
 VAPI(VanillaGraphics) VanillaCreateGraphicsOfWindow(VanillaWindow Window) {
-	return VanillaPortCreateGraphicsOfWindowCachedInMemoey(Window);
-}
+	if (Window) {
+#ifdef WIN32
+		HDC MemoryDC = CreateCompatibleDC(NULL);
+		if (!MemoryDC) {
+			return NULL;
+		}
+		BITMAPINFO BitmapInfo;
+		memset(&BitmapInfo, 0, sizeof(BitmapInfo));
+		BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
+		BitmapInfo.bmiHeader.biBitCount = 32;
+		BitmapInfo.bmiHeader.biWidth = Window->Rect.Width;
+		BitmapInfo.bmiHeader.biHeight = -Window->Rect.Height;
+		BitmapInfo.bmiHeader.biPlanes = 1;
+		VanillaAny Bits;
+		HBITMAP HBitmap = CreateDIBSection(0, &BitmapInfo, 0, &Bits, 0, 0);
+		if (!HBitmap) {
+			DeleteDC(MemoryDC);
+			return NULL;
+		}
 
+		HBITMAP OldBitmap = (HBITMAP)SelectObject(MemoryDC, (HGDIOBJ)HBitmap);
+
+		//Bitmap.setConfig(SkBitmap::kARGB_8888_Config, Window->Rect.Width, Window->Rect.Height, ((Window->Rect.Width * 32 + 15) / 16) * 2);
+		//Bitmap.setPixels(Bits);
+		VanillaGraphics Graphics = new VGraphics;
+		Graphics->Bitmap.installPixels(SkImageInfo::MakeN32Premul(Window->Rect.Width, Window->Rect.Height), Bits, ((Window->Rect.Width * 32 + 15) / 16) * 2);
+		new (&Graphics->Canvas) SkCanvas(Graphics->Bitmap);
+		Graphics->PortGraphics = new VPortGraphics;
+		Graphics->PortGraphics->MemoryDC = MemoryDC;
+		Graphics->PortGraphics->CurrentBitmap = HBitmap;
+		Graphics->Width = Window->Rect.Width;
+		Graphics->Height = Window->Rect.Height;
+		Graphics->PortGraphics->OldBitmap = OldBitmap;
+		return Graphics;
+#elif defined LINUX
+		//SkBitmap Bitmap;
+		//Bitmap.allocPixels(SkImageInfo::Make(Window->Rect.Width, Window->Rect.Height, kBGRA_8888_SkColorType, kPremul_SkAlphaType));
+		VanillaGraphics Graphics = VanillaCreateGraphicsInMemory(Window->Rect.Width, Window->Rect.Height);
+		//Graphics->Width = Window->Rect.Width;
+		//Graphics->Height = Window->Rect.Height;
+		Graphics->PortGraphics = new VPortGraphics;
+		Graphics->PortGraphics->cairo_surface = cairo_image_surface_create_for_data((unsigned char *)Graphics->Bitmap.getPixels(), CAIRO_FORMAT_ARGB32, Window->Rect.Width, Window->Rect.Height, ((Window->Rect.Width * 32 + 15) / 16) * 2);
+		//Graphics->image = xcb_image_create_from_bitmap_data((uint8_t*)Bitmap->getPixels(), Window->Rect.Width, Window->Rect.Height);
+		return Graphics;
+#endif
+	}
+	return NULL;
+}
 VAPI(VanillaVoid) VanillaDestroyGraphicsOfWindow(VanillaGraphics Graphcis) {
-	VanillaPortDestroyGraphicsOfWindowCachedInMemoey(Graphcis);
+	if (Graphcis) {
+#ifdef WIN32
+		Graphcis->Bitmap.reset();
+		DeleteObject((HBITMAP)SelectObject(Graphcis->PortGraphics->MemoryDC, (HGDIOBJ)Graphcis->PortGraphics->OldBitmap));
+		DeleteDC(Graphcis->PortGraphics->MemoryDC);
+		delete Graphcis->PortGraphics;
+		VanillaDestroyGraphics(Graphcis);
+#elif defined LINUX
+		cairo_surface_destroy(Graphcis->PortGraphics->cairo_surface);
+		delete Graphcis->PortGraphics;
+		VanillaDestroyGraphics(Graphcis);
+		//xcb_free_pixmap(connection, Graphics->bitmap);
+#endif
+	}
+	return;
 }
 
 VAPI(VanillaVoid) VanillaDestroyGraphics(VanillaGraphics Graphics) {
@@ -258,4 +317,20 @@ VAPI(VanillaVoid) VanillaDestroyImage(VanillaImage Image) {
 	if (Image) {
 		free(Image);
 	}
+}
+SkTypeface* VanillaPortCreateSkTypeface(VanillaText FontName, SkTypeface::Style Style) {
+#ifdef WIN32
+	VanillaPort_ICONV;
+	const wchar_t* Unicode;
+	Unicode = VanillaPort_U2W(FontName).c_str();
+	int LengthOld = wcslen(Unicode);
+	int LengthNew = LengthOld * 2 + 1;
+	char* Ansi = (char*)alloca(LengthNew);
+	LengthNew = WideCharToMultiByte(CP_ACP, NULL, Unicode, LengthOld, Ansi, LengthNew, NULL, NULL);
+	Ansi[LengthNew] = 0;
+	return SkTypeface::CreateFromName(Ansi, Style);
+#elif defined LINUX
+	return SkTypeface::CreateFromName(FontName, Style);
+#endif
+	return NULL;
 }

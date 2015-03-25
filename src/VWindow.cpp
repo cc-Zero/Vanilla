@@ -20,7 +20,7 @@
 	DefaultControl.Control->CtlProc = VanillaWindowDefaultControlsProc; \
 	DefaultControl.ID = DefaultControlID;
 
-VAPI(VanillaWindow) VanillaCreateWindow(VanillaRect Rect,
+VAPI(VanillaWindow) VanillaCreateWindow(VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height,
 					VanillaInt WindowStyle,
 					VanillaText Title,
 					VanillaStringFormat StringFormat,
@@ -32,14 +32,13 @@ VAPI(VanillaWindow) VanillaCreateWindow(VanillaRect Rect,
 	VanillaWindow Window = (VanillaWindow)malloc(sizeof(VWindow));
 	memset(Window, 0, sizeof(VWindow));
 
-	VanillaPortWindow PortWindow = VanillaPortCreateWindow(Rect, Title, !(WindowStyle & VWS_NOTASKBAR), (WindowStyle & VWS_POSMIDDLE), Window);
+	VanillaPortWindow PortWindow = VanillaPortCreateWindow(Left, Top, Width, Height, Title, !(WindowStyle & VWS_NOTASKBAR), (WindowStyle & VWS_POSMIDDLE), Window);
 	if (NULL == PortWindow) {
 		free(Window);
 		return NULL;
 	}
 	Window->PortWindow = PortWindow;	//保存移植层的window对象
-	Window->Rect = *Rect;
-
+	MAKEVRECT(Window->Rect, Left, Top, Width, Height);
 
 	Window->BackgroundColor = BackgroundColor;
 	Window->BackgroundImage = BackgroundImage;
@@ -53,11 +52,20 @@ VAPI(VanillaWindow) VanillaCreateWindow(VanillaRect Rect,
 
 	Window->TaskQueue = new VTaskQueue(Window);//创建任务列队
 	/*创建根控件*/
-	VanillaCreateDefaultControl(VanillaControlCreate((VanillaControl)(- (VanillaInt)Window), "VanillaUI.WindowRootControl", RECT(0, 0, Window->Rect.Width, Window->Rect.Height), NULL, NULL, true, true, NULL), Window->RootControl, Window, VWDC_ROOT);
-
+	//VanillaCreateDefaultControl(VanillaControlCreate((VanillaControl)(- (VanillaInt)Window), "VanillaUI.WindowRootControl", RECT(0, 0, Window->Rect.Width, Window->Rect.Height), NULL, NULL, true, true, NULL), Window->RootControl, Window, VWDC_ROOT);
+	Window->RootControl.Control = VanillaControlCreate((VanillaControl)(-(VanillaInt)Window), "VanillaUI.WindowRootControl", 0, 0, Window->Rect.Width, Window->Rect.Height, NULL, NULL, true, true, NULL);
+	Window->RootControl.Control->ID = (VanillaInt)&Window->RootControl;
+	Window->RootControl.Window = Window;
+	Window->RootControl.Control->CtlProc = VanillaWindowDefaultControlsProc;
+	Window->RootControl.ID = VWDC_ROOT;
 	if (WindowStyle & VWS_TITLE) {
 		/*创建标题栏 作为跟控件的子控件*/
-		VanillaCreateDefaultControl(VanillaLabelCreate(VanillaGetWindowRootControl(Window), RECT(13, 11, Window->Rect.Width - 20, 30), Title, StringFormat, true, true), Window->Title, Window, VWDC_TITLE);
+		//VanillaCreateDefaultControl(VanillaLabelCreate(VanillaGetWindowRootControl(Window), RECT(13, 11, Window->Rect.Width - 20, 30), Title, StringFormat, true, true), Window->Title, Window, VWDC_TITLE);
+		Window->Title.Control = VanillaLabelCreate(VanillaGetWindowRootControl(Window), 13, 11, Window->Rect.Width - 20, 30, Title, StringFormat, true, true);
+		Window->Title.Control->ID = (VanillaInt)&Window->Title;
+		Window->Title.Window = Window;
+		Window->Title.Control->CtlProc = VanillaWindowDefaultControlsProc;
+		Window->Title.ID = VWDC_TITLE;
 	}
 	/*创建窗口相关Graphics对象*/
 	VanillaWindowInitGraphics(Window, true);
@@ -258,14 +266,17 @@ VanillaVoid VanillaWindowUpdate(VanillaWindow Window, VanillaRect UpdateRect) {
 
 VanillaVoid VanillaWindowUpdateGraphicsRect(VanillaWindow Window, VanillaRect UpdateRect, VanillaBool ForceRedraw, VanillaBool Flash) {
 	if (!UpdateRect) {
+		VRect r;
 		/*更新矩形为空的话则更新整个窗口*/
-		UpdateRect = RECT(0, 0, Window->Rect.Width, Window->Rect.Height);
+		UpdateRect = &r;
+		MAKEVRECTP(UpdateRect, 0, 0, Window->Rect.Width, Window->Rect.Height);
 	}
 	/*复制更新区域的背景到窗口*/
 	VanillaAlphaBlend(Window->GraphicsWindow, UpdateRect->Left, UpdateRect->Top, UpdateRect->Width, UpdateRect->Height, Window->GraphicsBackground, UpdateRect->Left, UpdateRect->Top, 255);
 	
 	VanillaControl Control = Window->RootControl.Control->ChildControlFirst;
-	VPoint OffsetPoint(0, 0);
+	VPoint OffsetPoint;
+	MAKEVPOINT(OffsetPoint, 0, 0);
 	VanillaByte Alpha = 255;
 	while (Control) {
 		VRect Intersect;
@@ -275,7 +286,8 @@ VanillaVoid VanillaWindowUpdateGraphicsRect(VanillaWindow Window, VanillaRect Up
 			/*到循环尾*/
 			continue;
 		}
-		VRect RectOfClient(Control->Rect.Left + OffsetPoint.x, Control->Rect.Top + OffsetPoint.y, Control->Rect.Width, Control->Rect.Height);
+		VRect RectOfClient;
+		MAKEVRECT(RectOfClient, Control->Rect.Left + OffsetPoint.x, Control->Rect.Top + OffsetPoint.y, Control->Rect.Width, Control->Rect.Height);
 		if (!VanillaIntersectRect(&RectOfClient, UpdateRect, &Intersect)) {
 			/*控件不在更新范围内 更新下一个同级控件*/
 			Control = Control->NextControl;

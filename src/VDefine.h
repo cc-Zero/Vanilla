@@ -6,10 +6,17 @@
 #define DEBUG_PUTPNG(BITMAP, FILE) SkASSERT(SkImageEncoder::EncodeFile(FILE, BITMAP, SkImageEncoder::kPNG_Type, 100));
 
 
+/*±‡“Î≈‰÷√*/
+//‰÷»æ∫Û∂À
+#define DRAW_SKIA
+//#define DRAW_AGG
+//#define DRAW_GDI
+//#define DRAW_CAIRO
+
+
 #ifdef WIN32
 
 #define VAPI(Type) extern "C" __declspec(dllexport) Type __stdcall
-//#define VAPI(Type) extern "C" __declspec(dllimport) Type __stdcall
 #define CLASS_IMPORT __declspec(dllexport)
 
 #else
@@ -27,12 +34,6 @@
 #ifdef LINUX
 #define RGB(r,g,b) ((VanillaInt)(((VanillaByte)(r)|((short)((VanillaByte)(g))<<8))|(((VanillaInt)(VanillaByte)(b))<<16)))
 #endif
-
-#define anew(type) new((type*)alloca(sizeof(type))) type
-
-#define RECT(Left,Top,Width,Height) anew(VRect)(Left,Top,Width,Height)
-
-
 
 
 typedef const char* VanillaText;

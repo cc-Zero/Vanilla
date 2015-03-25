@@ -47,16 +47,6 @@ typedef struct VPortWindow
 #endif
 } *VanillaPortWindow, _VPortWindow;
 
-typedef struct VPortGraphics
-{
-#ifdef WIN32
-	HDC MemoryDC;
-	HBITMAP OldBitmap;
-	HBITMAP CurrentBitmap;
-#elif defined LINUX
-    cairo_surface_t* cairo_surface;
-#endif
-} *VanillaPortGraphics, _VPortGraphics;
 
 #ifdef WIN32
 #define PROP_ID		(LPCWSTR)101
@@ -250,7 +240,7 @@ VanillaBool VanillaPortInitializeX() {
 #endif
 }
 
-VanillaPortWindow VanillaPortCreateWindow(VanillaRect Rect, VanillaString Title, VanillaBool ShowInTaskbar, VanillaBool PosMiddle, VanillaWindow Window) {
+VanillaPortWindow VanillaPortCreateWindow(VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaString Title, VanillaBool ShowInTaskbar, VanillaBool PosMiddle, VanillaWindow Window) {
 #ifdef WIN32
 	static VanillaBool ClassRegistered;//是否注册WNDCLASS
 	VanillaPort_ICONV;
@@ -268,17 +258,17 @@ VanillaPortWindow VanillaPortCreateWindow(VanillaRect Rect, VanillaString Title,
 	}
 	if (PosMiddle) {
 		/*窗口居中*/
-		Rect->Left = (GetSystemMetrics(SM_CXSCREEN) - Rect->Width) / 2;
-		Rect->Top = (GetSystemMetrics(SM_CYSCREEN) - Rect->Height) / 2;
+		Left = (GetSystemMetrics(SM_CXSCREEN) - Width) / 2;
+		Top = (GetSystemMetrics(SM_CYSCREEN) - Height) / 2;
 	}
 	HWND hWnd = CreateWindowExW(ShowInTaskbar ? NULL : WS_EX_TOOLWINDOW,
 		L"VanillaUI.Window",
 		VanillaPort_U2W(Title).c_str(),
 		WS_POPUP | WS_TILED | WS_SYSMENU,
-		Rect->Left,
-		Rect->Top,
-		Rect->Width,
-		Rect->Height,
+		Left,
+		Top,
+		Width,
+		Height,
 		NULL,
 		NULL,
 		NULL,
@@ -530,74 +520,6 @@ VanillaVoid VanillaPortDragWindow(VanillaPortWindow PortWindow) {
 	return;
 }
 
-VanillaVoid VanillaPortDestroyGraphicsOfWindowCachedInMemoey(VanillaGraphics Graphics) {
-	if (Graphics) {
-#ifdef WIN32
-	Graphics->Bitmap.reset();
-	DeleteObject((HBITMAP)SelectObject(Graphics->PortGraphics->MemoryDC, (HGDIOBJ)Graphics->PortGraphics->OldBitmap));
-	DeleteDC(Graphics->PortGraphics->MemoryDC);
-	delete Graphics->PortGraphics;
-        VanillaDestroyGraphics(Graphics);
-#elif defined LINUX
-        cairo_surface_destroy(Graphics->PortGraphics->cairo_surface);
-        delete Graphics->PortGraphics;
-        VanillaDestroyGraphics(Graphics);
-	//xcb_free_pixmap(connection, Graphics->bitmap);
-#endif
-	}
-	return;
-}
-
-VanillaGraphics VanillaPortCreateGraphicsOfWindowCachedInMemoey(VanillaWindow Window) {
-	if (Window) {
-#ifdef WIN32
-		HDC MemoryDC = CreateCompatibleDC(NULL);
-		if (!MemoryDC) {
-			return NULL;
-		}
-		BITMAPINFO BitmapInfo;
-		memset(&BitmapInfo, 0, sizeof(BitmapInfo));
-		BitmapInfo.bmiHeader.biSize = sizeof(BitmapInfo.bmiHeader);
-		BitmapInfo.bmiHeader.biBitCount = 32;
-		BitmapInfo.bmiHeader.biWidth = Window->Rect.Width;
-		BitmapInfo.bmiHeader.biHeight = - Window->Rect.Height;
-		BitmapInfo.bmiHeader.biPlanes = 1;
-		VanillaAny Bits;
-		HBITMAP HBitmap = CreateDIBSection(0, &BitmapInfo, 0, &Bits, 0, 0);
-		if (!HBitmap) {
-			DeleteDC(MemoryDC);
-			return NULL;
-		}
-
-		HBITMAP OldBitmap = (HBITMAP)SelectObject(MemoryDC, (HGDIOBJ)HBitmap);
-		
-		//Bitmap.setConfig(SkBitmap::kARGB_8888_Config, Window->Rect.Width, Window->Rect.Height, ((Window->Rect.Width * 32 + 15) / 16) * 2);
-		//Bitmap.setPixels(Bits);
-		VanillaGraphics Graphics = new VGraphics;
-		Graphics->Bitmap.installPixels(SkImageInfo::MakeN32Premul(Window->Rect.Width, Window->Rect.Height), Bits, ((Window->Rect.Width * 32 + 15) / 16) * 2);
-		new (&Graphics->Canvas) SkCanvas(Graphics->Bitmap);
-		Graphics->PortGraphics = new VPortGraphics;
-		Graphics->PortGraphics->MemoryDC = MemoryDC;
-		Graphics->PortGraphics->CurrentBitmap = HBitmap;
-		Graphics->Width = Window->Rect.Width;
-		Graphics->Height = Window->Rect.Height;
-		Graphics->PortGraphics->OldBitmap = OldBitmap;
-		return Graphics;
-#elif defined LINUX
-       	//SkBitmap Bitmap;
-        //Bitmap.allocPixels(SkImageInfo::Make(Window->Rect.Width, Window->Rect.Height, kBGRA_8888_SkColorType, kPremul_SkAlphaType));
-        VanillaGraphics Graphics = VanillaCreateGraphicsInMemory(Window->Rect.Width, Window->Rect.Height);
-        //Graphics->Width = Window->Rect.Width;
-        //Graphics->Height = Window->Rect.Height;
-        Graphics->PortGraphics = new VPortGraphics;
-        Graphics->PortGraphics->cairo_surface = cairo_image_surface_create_for_data((unsigned char *)Graphics->Bitmap.getPixels(), CAIRO_FORMAT_ARGB32, Window->Rect.Width, Window->Rect.Height, ((Window->Rect.Width * 32 + 15) / 16) * 2);
-        //Graphics->image = xcb_image_create_from_bitmap_data((uint8_t*)Bitmap->getPixels(), Window->Rect.Width, Window->Rect.Height);
-        return Graphics;
-#endif
-	}
-	return NULL;
-}
-
 VanillaVoid VanillaPortUpdateWindow(VanillaWindow Window, VanillaRect UpdateRect) {
 	if (Window) {
 #ifdef WIN32
@@ -658,23 +580,6 @@ VanillaVoid VanillaPortUpdateWindow(VanillaWindow Window, VanillaRect UpdateRect
         xcb_flush(connection);
 #endif
 	}
-}
-
-SkTypeface* VanillaPortCreateSkTypeface(VanillaText FontName, SkTypeface::Style Style) {
-#ifdef WIN32
-	VanillaPort_ICONV;
-	const wchar_t* Unicode;
-	Unicode = VanillaPort_U2W(FontName).c_str();
-	int LengthOld = wcslen(Unicode);
-	int LengthNew = LengthOld * 2 + 1;
-	char* Ansi = (char*)alloca(LengthNew);
-	LengthNew = WideCharToMultiByte(CP_ACP, NULL, Unicode, LengthOld, Ansi, LengthNew, NULL, NULL);
-	Ansi [LengthNew] = 0;
-	return SkTypeface::CreateFromName(Ansi, Style);
-#elif defined LINUX
-    return SkTypeface::CreateFromName(FontName, Style);
-#endif
-    return NULL;
 }
 
 VanillaInt VanillaPortMessageLoop() {
@@ -776,12 +681,22 @@ LRESULT CALLBACK VanillaPortWin32WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		return 0;
 		break;
 	}
+	case WM_SYSCOMMAND:{
+		if (wParam == SC_MINIMIZE){
+			/*最小化*/
+			Window->FirstShow = false;
+		}
+		break;
+	}
 	case WM_SIZE: {
 		/*窗口大小被改变*/
 		Window->Rect.Width = (VanillaInt)(short)LOWORD(lParam);
 		Window->Rect.Height = (VanillaInt)(short)HIWORD(lParam);
 		VanillaControlMove(Window->Title.Control, Window->Title.Control->Rect.Left, Window->Title.Control->Rect.Top, Window->Rect.Width - Window->Title.Control->Rect.Left, Window->Title.Control->Rect.Height);
-		VanillaWindowInitGraphics(Window, true);
+		if (Window->FirstShow)
+		{
+			VanillaWindowInitGraphics(Window, true);
+		}
 		break;
 	}
 	case WM_MOVE: {

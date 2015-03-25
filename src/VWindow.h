@@ -76,7 +76,7 @@ typedef struct VWindow
 * @param Shape 形状 VWFS_开头的常量
 * @param Returns 成功返回VanillaWindow对象,不成功返回NULL.
 */
-VAPI(VanillaWindow) VanillaCreateWindow(VanillaRect Rect,
+VAPI(VanillaWindow) VanillaCreateWindow(VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height,
 	VanillaInt WndStyle,
 	VanillaText Title,
 	VanillaStringFormat StringFormat,

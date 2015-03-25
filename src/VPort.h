@@ -22,7 +22,7 @@ VanillaBool VanillaPortInitializeX();
 * @param Window 框架层VanillaWindow指针
 * @param Returns 成功返回VanillaPortWindow对象,不成功返回NULL.
 */
-VanillaPortWindow VanillaPortCreateWindow(VanillaRect Rect, VanillaString Title, VanillaBool ShowInTaskbar, VanillaBool PosMiddle, VanillaWindow Window);
+VanillaPortWindow VanillaPortCreateWindow(VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaString Title, VanillaBool ShowInTaskbar, VanillaBool PosMiddle, VanillaWindow Window);
 /**
 * 此函数用作销毁由VanillaPortCreateWindow创建的对象.
 * @param PortWindow VanillaPortWindow对象
@@ -74,8 +74,6 @@ VanillaBool VanillaPortGetWindowComposite(VanillaPortWindow PortWindow);
 * @此函数没有返回值.
 */
 VanillaVoid VanillaPortDragWindow(VanillaPortWindow PortWindow);
-VanillaVoid VanillaPortDestroyGraphicsOfWindowCachedInMemoey(VanillaGraphics Graphics);
-VanillaGraphics VanillaPortCreateGraphicsOfWindowCachedInMemoey(VanillaWindow Window);
 /**
 * 此函数用作刷新窗口显示.
 * @param PortWindow VanillaPortWindow对象
@@ -83,7 +81,6 @@ VanillaGraphics VanillaPortCreateGraphicsOfWindowCachedInMemoey(VanillaWindow Wi
 * @此函数没有返回值.
 */
 VanillaVoid VanillaPortUpdateWindow(VanillaWindow Window, VanillaRect UpdateRect);
-SkTypeface* VanillaPortCreateSkTypeface(VanillaText FontName, SkTypeface::Style Style);
 /**
 * 此函数用作移植层的消息循环.
 * @param Returns int.

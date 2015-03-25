@@ -24,7 +24,7 @@ VAPI(VanillaControlClass) VanillaRegisterControlClass(VanillaText ClassName, VCt
 	return Class;
 }
 
-VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaRect Rect, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct) {
+VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct) {
 	VanillaControlClass Class = ControlClasses [ClassName];
 	if (ControlClasses [ClassName] == NULL) {
 		return NULL;
@@ -62,7 +62,7 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaT
 	Control->Graphics_Gradient2 = NULL;
 	Control->Visible = Visible;
 	Control->MousePenetration = false;
-	Control->Rect = *Rect;
+	MAKEVRECT(Control->Rect, Left, Top, Width, Height);
 	Control->ParentControl = RootControl ? NULL : ParentControl;
 	if (!RootControl) {
 		if (Control->ParentControl->ChildControlEnd != NULL) {
@@ -77,7 +77,7 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaT
 	Control->DisabledCount = Control->ParentControl ? (Control->ParentControl->DisabledCount + ((Control->ParentControl->Enabled) ? 0 : 1)) : 0;
 	Control->InvisibleCount = Control->ParentControl ? (Control->ParentControl->InvisibleCount + ((Control->ParentControl->Visible) ? 0 : 1)) : 0;
 	if (!(RootControl || Class->Virtual)) {
-		Control->Graphics = VanillaCreateGraphicsInMemory(Rect->Width, Rect->Height);
+		Control->Graphics = VanillaCreateGraphicsInMemory(Width, Height);
 	} else {
 		Control->Graphics = NULL;
 	}
@@ -237,12 +237,15 @@ VAPI(VanillaVoid) VanillaControlMove(VanillaControl Control, VanillaInt Left, Va
 	if (Control->Rect.Width != Width || Control->Rect.Height != Height) {
 		Sized = true;
 	}
+	if (Width < 0 || Height < 0 ){
+		return;
+	}
 	/*以前的控件矩形*/
 	VRect OldRect = Control->Rect;
 	VRect OldRectOfWindow;
 	VanillaControlGetRectOfWindow(Control, &OldRectOfWindow);
 	/*更新窗口矩形*/
-	new(&Control->Rect) VRect(Left, Top, Width, Height);
+	MAKEVRECT(Control->Rect, Left, Top, Width, Height);
 	if (Moved) {
 		/*通知控件位置被移动*/
 		VanillaControlSendMessage(Control, VM_MOVE, NULL, (VanillaInt)&OldRect.Left);

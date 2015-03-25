@@ -35,7 +35,8 @@ VanillaText VLabel::GetTitle() {
 }
 
 VanillaVoid VLabel::OnPaint(VanillaGraphics Graphics) {
-	VRect Rect = this->GetFrameRect();
+	VRect Rect;
+	this->GetFrameRect(&Rect);
 	VanillaDrawString(Graphics, this->StringFormat, String2Text(this->Title), &Rect);
 }
 
@@ -52,8 +53,8 @@ VanillaControlClass VLabel::Register() {
 }
 
 
-VAPI(VanillaControl) VanillaLabelCreate(VanillaControl ParentControl, VanillaRect Rect, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled) {
-	VanillaLabel Label = new VLabel(ParentControl, Rect, Visible, Enabled);
+VAPI(VanillaControl) VanillaLabelCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled) {
+	VanillaLabel Label = new VLabel(ParentControl, Left,  Top, Width, Height, Visible, Enabled);
 	Label->Create(Title, StringFormat);
 	return Label->Control;
 }

@@ -41,7 +41,9 @@ VAPI(VanillaBin) VanillaReadFileToBin(VanillaText FileName) {
 	VanillaByte* Buffer = new VanillaByte[Size];
 	fread(Buffer, 1, Size, File);
 	fclose(File);
-	return new VBin(Buffer, Size);
+	VanillaBin b = MALLOCVBIN();
+	MAKEVBINP(b, Buffer, Size);
+	return b;
 }
 
 VAPI(VanillaBool) VanillaIsPointInRect(VanillaInt x, VanillaInt y, VanillaRect Rect) {

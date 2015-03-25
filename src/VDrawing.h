@@ -12,6 +12,54 @@
 #define VTS_VALIGN_BOTTOM 32	//垂直底部对齐
 #define VTS_SHADOW 64
 
+typedef struct VImage {
+	SkBitmap Bitmap;
+	VanillaInt Width;
+	VanillaInt Height;
+}*VanillaImage, _VImage;
+
+typedef struct VPortGraphics
+{
+#ifdef WIN32
+	HDC MemoryDC;
+	HBITMAP OldBitmap;
+	HBITMAP CurrentBitmap;
+#elif defined LINUX
+	cairo_surface_t* cairo_surface;
+#endif
+} *VanillaPortGraphics, _VPortGraphics;
+
+typedef struct VGraphics {
+	SkCanvas Canvas;
+	char Buffers[8]; // fixme : Skia's memory-overflow bug.
+	SkBitmap Bitmap;
+	SkPaint Paint;
+	VanillaInt Width;
+	VanillaInt Height;
+	VanillaPortGraphics PortGraphics;
+	~VGraphics() {
+		//delete this->Canvas;
+		//delete this->Paint;
+		//delete this->Bitmap;
+	}
+	VGraphics(){
+		//memset(this->Buffers, 0, sizeof(this->Buffers));
+	}
+}*VanillaGraphics, _VGraphics;
+
+typedef struct VStringFormat
+{
+	SkTypeface* Typeface;
+	SkTextBox::SpacingAlign VAlign;
+	SkPaint::Align Align;
+	SkTextBox::Mode LineMode;
+	VanillaColor Color;
+	VanillaColor Shadow;
+	VanillaInt Style;
+	SkScalar Size;
+	static SkMaskFilter* BlurMaskFilter;
+}*VanillaStringFormat, _VStringFromat;
+
 /**
 * 此函数用作填充一个矩形区域.
 * @param Graphics VanillaGraphics对象
@@ -192,4 +240,5 @@ VAPI(VanillaImage) VanillaLoadImageFromBinary(VanillaBin Binary);
 * @此函数没有返回值.
 */
 VAPI(VanillaVoid) VanillaDestroyImage(VanillaImage Image);
+SkTypeface* VanillaPortCreateSkTypeface(VanillaText FontName, SkTypeface::Style Style);
 #endif	//__VANILLA_CORE_DRAWING_H__

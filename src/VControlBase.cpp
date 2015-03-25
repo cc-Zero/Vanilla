@@ -13,16 +13,16 @@ VControlBase::~VControlBase() {
 	}
 }
 
-VanillaBool VControlBase::Init(VanillaControl ParentControl, VanillaRect Rect, VanillaBool Visible, VanillaBool Enabled) {
-	return this->BaseCreate(this->OnCreate(), ParentControl, Rect, Visible, Enabled);
+VanillaBool VControlBase::Init(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaBool Visible, VanillaBool Enabled) {
+	return this->BaseCreate(this->OnCreate(), ParentControl, Left, Top, Width, Height, Visible, Enabled);
 }
 
 VanillaControlClass VControlBase::BaseRegister(VanillaText ClassName, VanillaBool Focusable, VanillaBool Virtual) {
 	return VanillaRegisterControlClass(ClassName, &VanillaBasedControlProc, Focusable, Virtual);
 }
 
-VanillaBool VControlBase::BaseCreate(VanillaText ClassName, VanillaControl ParentControl, VanillaRect Rect, VanillaBool Visible, VanillaBool Enabled) {
-	this->Control = ::VanillaControlCreate(ParentControl, ClassName, Rect, this, NULL, Visible, Enabled, NULL);
+VanillaBool VControlBase::BaseCreate(VanillaText ClassName, VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaBool Visible, VanillaBool Enabled) {
+	this->Control = ::VanillaControlCreate(ParentControl, ClassName, Left, Top, Width, Height, this, NULL, Visible, Enabled, NULL);
 	if (this->Control) {
 		this->Control->CtlProc = &VanillaBasedControlProc;
 		return true;
@@ -96,8 +96,8 @@ VanillaRect VControlBase::GetRect() {
 	return &this->Control->Rect;
 }
 
-VRect VControlBase::GetFrameRect() {
-	return VRect(0, 0, this->Control->Rect.Width - 1, this->Control->Rect.Height - 1);
+VanillaVoid VControlBase::GetFrameRect(VRect *r) {
+	MAKEVRECTP(r, 0, 0, this->Control->Rect.Width - 1, this->Control->Rect.Height - 1);
 }
 
 VanillaVoid VControlBase::Left(VanillaInt NewLeft) {

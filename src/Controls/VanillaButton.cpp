@@ -93,7 +93,8 @@ VanillaVoid VButton::OnMouseLUp(VanillaPoint Point) {
 }
 
 VanillaVoid VButton::OnPaint(VanillaGraphics Graphics) {
-	VRect Rect = this->GetFrameRect();
+	VRect Rect;
+	this->GetFrameRect(&Rect);
 	switch (this->Style) {
 	case VBS_METRO:
 		VanillaFillRect(Graphics, this->ButtonColor[VanillaControlIsEnable(Control) ? this->Status : 3], 0, 0, Rect.Width, Rect.Height);
@@ -125,8 +126,8 @@ VanillaControlClass VButton::Register() {
 }
 
 
-VAPI(VanillaControl) VanillaButtonCreate(VanillaControl ParentControl, VanillaRect Rect, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled) {
-	VanillaButton Button = new VButton(ParentControl, Rect, Visible, Enabled);
+VAPI(VanillaControl) VanillaButtonCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled) {
+	VanillaButton Button = new VButton(ParentControl, Left, Top, Width, Height, Visible, Enabled);
 	Button->Create(Title, StringFormat);
 	return Button->Control;
 }

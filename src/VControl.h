@@ -138,7 +138,7 @@ VAPI(VanillaControlClass) VanillaRegisterControlClass(VanillaText ClassName, VCt
 * @param CreateStruct
 * @param Returns 成功返回VanillaControl对象,不成功返回NULL.
 */
-VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaRect Rect, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct);
+VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct);
 /**
 * 此函数用作销毁VanillaControl(控件)对象.
 * @param Control VanillaControl对象

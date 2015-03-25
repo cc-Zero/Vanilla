@@ -20,7 +20,9 @@ VanillaBin ReadFileBin(FILE* File) {
 	VanillaByte* Buffer = new VanillaByte[Length];
 	/*读取数据到内存*/
 	fread(Buffer, 1, Length, File);
-	return new VBin(Buffer, Length);
+	VanillaBin b = MALLOCVBIN();
+	MAKEVBINP(b, Buffer, Length);
+	return b;
 }
 
 VanillaVoid WriteFileText(FILE* File, VanillaText String) {
