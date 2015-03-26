@@ -4,7 +4,6 @@
 #include "VStruct.h"
 #include "VWindow.h"
 #include "VControl.h"
-#include "VControlBase.h"
 #include "VDrawing.h"
 #include "VPort.h"
 #include "VGlobalFunction.h"

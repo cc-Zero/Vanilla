@@ -33,9 +33,6 @@
     <ClCompile Include="src\VControl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\VControlBase.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\VDrawing.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\VControl.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VControlBase.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\VDefine.h">

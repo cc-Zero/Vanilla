@@ -92,7 +92,6 @@
     <ClCompile Include="src\Utils\VSkinDB.cpp" />
     <ClCompile Include="src\Utils\VTaskQueue.cpp" />
     <ClCompile Include="src\VControl.cpp" />
-    <ClCompile Include="src\VControlBase.cpp" />
     <ClCompile Include="src\VDrawing.cpp" />
     <ClCompile Include="src\VGlobalFunction.cpp" />
     <ClCompile Include="src\VPort.cpp" />
@@ -108,7 +107,6 @@
     <ClInclude Include="src\Utils\VSkinDB.h" />
     <ClInclude Include="src\Utils\VTaskQueue.h" />
     <ClInclude Include="src\VControl.h" />
-    <ClInclude Include="src\VControlBase.h" />
     <ClInclude Include="src\VDefine.h" />
     <ClInclude Include="src\VDrawing.h" />
     <ClInclude Include="src\VGlobalFunction.h" />

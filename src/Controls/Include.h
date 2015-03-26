@@ -6,7 +6,6 @@
 #include "../VStruct.h"
 #include "../VWindow.h"
 #include "../VControl.h"
-#include "../VControlBase.h"
 #include "../VGlobalFunction.h"
 #include "../VDrawing.h"
 
