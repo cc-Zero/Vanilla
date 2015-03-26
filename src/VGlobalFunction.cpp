@@ -6,22 +6,11 @@
 #include "VControl.h"
 #include "VPort.h"
 #include "VGlobalFunction.h"
-#include "Controls/VControlRegister.h"
 
 VanillaBool VInit() {
-	if (!VInit_ControlClass()) {
-		return false;
-	}
 	if (!VanillaPortInitializeX()) {
 		return false;
 	}
-	return true;
-}
-
-VanillaBool VInit_ControlClass()
-{
-    VanillaRegisterControls();
-    VanillaRegisterControlClass("VanillaUI.WindowRootControl", &VanillaWindowDefaultControlsProc, false, true);
 	return true;
 }
 

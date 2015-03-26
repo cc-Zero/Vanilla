@@ -2,7 +2,7 @@
 #define __VANILLA_CORE_DEFINE_H__
 // Vanilla Defines
 
-#define DEBUG_BORDER 1
+#define DEBUG_BORDER 0
 #define DEBUG_PUTPNG(BITMAP, FILE) SkASSERT(SkImageEncoder::EncodeFile(FILE, BITMAP, SkImageEncoder::kPNG_Type, 100));
 
 
@@ -73,8 +73,6 @@ typedef struct VGraphics  *VanillaGraphics, _VGraphics;
 typedef struct VStringFormat *VanillaStringFormat, _VStringFromat;
 
 typedef struct VControl  *VanillaControl, _VControl;
-
-typedef struct VControlClass  *VanillaControlClass, _VControlClass;
 
 typedef struct VSkinDB *VanillaSkinDB, _VSkinDB;
 

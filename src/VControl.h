@@ -98,9 +98,15 @@ typedef struct VControl
 	// 绑定控件 此控件可接收到NOTIFY消息
 	VanillaControl BindOwner;
 	// 控件类
-	VanillaControlClass Class;
+	//VanillaControlClass Class;
+	/*暂时不知道什么用*/
+	VanillaBool Focusable;
+	VanillaBool Virtual;
 
+	//矩形区域 相对于父窗口的
 	VRect Rect;
+	//矩形区域 客户区的
+	VRect CRect;
 
 	// 缓存图形
 	VanillaGraphics Graphics;
@@ -117,19 +123,9 @@ typedef struct VControl
 	VanillaAny ControlData;
 } *VanillaControl, _VControl;
 
-typedef struct VControlClass
-{
-	VanillaString ClassName;
-	VCtlProc CtlProc;
-	VanillaBool Focusable;
-	VanillaBool Virtual;
-} *VanillaControlClass, _VControlClass;
-
-VAPI(VanillaControlClass) VanillaRegisterControlClass(VanillaText ClassName, VCtlProc CtlProc, VanillaBool Focusable, VanillaBool Virtual);
 /**
 * 此函数用作创建VanillaControl(控件)对象.
 * @param ParentControl 上级控件
-* @param ClassName 类名
 * @param Rect 控件矩形
 * @param ControlData
 * @param CustomID
@@ -138,7 +134,7 @@ VAPI(VanillaControlClass) VanillaRegisterControlClass(VanillaText ClassName, VCt
 * @param CreateStruct
 * @param Returns 成功返回VanillaControl对象,不成功返回NULL.
 */
-VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct);
+VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct);
 /**
 * 此函数用作销毁VanillaControl(控件)对象.
 * @param Control VanillaControl对象
@@ -240,6 +236,14 @@ VAPI(VanillaVoid) VanillaControlSetDefaultEventProc(VCtlEventProc EventProc);
 * @param Returns 返回用户处理事件后的返回值
 */
 VAPI(VanillaInt) VanillaControlTriggerEvent(VanillaControl Control, VanillaInt Event, VanillaInt Param1, VanillaInt Param2, VanillaInt Param3);
+/**
+* 此函数用作给Control发送消息.
+* @param Control VanillaControl对象
+* @param Message 事件类型
+* @param Param1 参数1
+* @param Param2 参数2
+* @param Returns 返回用户处理事件后的返回值
+*/
 VAPI(VanillaInt) VanillaControlSendMessage(VanillaControl Control, VanillaInt Message, VanillaInt Param1, VanillaInt Param2);
 VAPI(VanillaVoid) VanillaControlSendMessageToChild(VanillaControl ParentControl, VanillaInt Message, VanillaInt Param1, VanillaInt Param2);
 VAPI(VanillaVoid) VanillaControlSendMessageToChildOfWindow(VanillaWindow Window, VanillaInt Message, VanillaInt Param1, VanillaInt Param2);
@@ -267,5 +271,4 @@ VAPI(VanillaControl) VanillaFindControlInControl(VanillaControl ParentControl, V
 */
 VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message, VanillaInt Param1, VanillaInt Param2);
 
-extern std::map<VanillaString, VanillaControlClass> ControlClasses;
 #endif	//__VANILLA_CORE_CONTROL_H__

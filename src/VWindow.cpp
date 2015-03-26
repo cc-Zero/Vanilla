@@ -12,14 +12,6 @@
 
 #include "Controls/VanillaLabel.h"
 
-
-#define VanillaCreateDefaultControl(NewControl, DefaultControl, Window, DefaultControlID) \
-	DefaultControl.Control = NewControl; \
-	DefaultControl.Control->ID = (VanillaInt)&DefaultControl; \
-	DefaultControl.Window = Window; \
-	DefaultControl.Control->CtlProc = VanillaWindowDefaultControlsProc; \
-	DefaultControl.ID = DefaultControlID;
-
 VAPI(VanillaWindow) VanillaCreateWindow(VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height,
 					VanillaInt WindowStyle,
 					VanillaText Title,
@@ -48,20 +40,21 @@ VAPI(VanillaWindow) VanillaCreateWindow(VanillaInt Left, VanillaInt Top, Vanilla
 
 	Window->ShadowColor = -1;//阴影颜色 默认无
 
+	Window->Title_StringFormat = StringFormat;
+	Window->Title_Title = Title;
 	VanillaSetWindowShape(Window, Shape);//窗口形状
 
 	Window->TaskQueue = new VTaskQueue(Window);//创建任务列队
+
 	/*创建根控件*/
-	//VanillaCreateDefaultControl(VanillaControlCreate((VanillaControl)(- (VanillaInt)Window), "VanillaUI.WindowRootControl", RECT(0, 0, Window->Rect.Width, Window->Rect.Height), NULL, NULL, true, true, NULL), Window->RootControl, Window, VWDC_ROOT);
-	Window->RootControl.Control = VanillaControlCreate((VanillaControl)(-(VanillaInt)Window), "VanillaUI.WindowRootControl", 0, 0, Window->Rect.Width, Window->Rect.Height, NULL, NULL, true, true, NULL);
+	Window->RootControl.Control = VanillaControlCreate((VanillaControl)(-(VanillaInt)Window), 0, 0, Window->Rect.Width, Window->Rect.Height, NULL, NULL, true, true, NULL);
 	Window->RootControl.Control->ID = (VanillaInt)&Window->RootControl;
 	Window->RootControl.Window = Window;
 	Window->RootControl.Control->CtlProc = VanillaWindowDefaultControlsProc;
 	Window->RootControl.ID = VWDC_ROOT;
 	if (WindowStyle & VWS_TITLE) {
 		/*创建标题栏 作为跟控件的子控件*/
-		//VanillaCreateDefaultControl(VanillaLabelCreate(VanillaGetWindowRootControl(Window), RECT(13, 11, Window->Rect.Width - 20, 30), Title, StringFormat, true, true), Window->Title, Window, VWDC_TITLE);
-		Window->Title.Control = VanillaLabelCreate(VanillaGetWindowRootControl(Window), 13, 11, Window->Rect.Width - 20, 30, Title, StringFormat, true, true);
+		Window->Title.Control = VanillaControlCreate(VanillaGetWindowRootControl(Window), 0, 0, Window->Rect.Width, 28, NULL, NULL, true, true,NULL);
 		Window->Title.Control->ID = (VanillaInt)&Window->Title;
 		Window->Title.Window = Window;
 		Window->Title.Control->CtlProc = VanillaWindowDefaultControlsProc;
@@ -294,7 +287,7 @@ VanillaVoid VanillaWindowUpdateGraphicsRect(VanillaWindow Window, VanillaRect Up
 			/*到循环尾*/
 			continue;
 		}
-		if (!Control->Class->Virtual) {
+		if (!Control->Virtual) {
 			if (ForceRedraw) {
 				VanillaControlSendMessage(Control, VM_REDRAW, 0, 0);
 			}
@@ -355,14 +348,20 @@ VanillaInt VanillaWindowDefaultControlsProc(VanillaInt ID, VanillaInt Message, V
 	else if (ControlInfo->ID == VWDC_TITLE) {
 		/*标题区消息*/
 		switch (Message) {
-		case VM_LBUTTONDOWN:
-			if (!(ControlInfo->Window->DragType & VWS_DRAG_NO)) {
-				/*任意移动窗口*/
-				VanillaPortDragWindow(ControlInfo->Window->PortWindow);
+			case VM_LBUTTONDOWN:{
+				if (!(ControlInfo->Window->DragType & VWS_DRAG_NO)) {
+					/*任意移动窗口*/
+					VanillaPortDragWindow(ControlInfo->Window->PortWindow);
+				}
+				break;
 			}
-			break;
+			case VM_PAINT:{
+				VanillaDrawString((VanillaGraphics)Param2, ControlInfo->Window->Title_StringFormat, ControlInfo->Window->Title_Title, &ControlInfo->Control->Rect);
+				/*重绘事件*/
+				break;
+			}
 		}
-		return Control->Class->CtlProc((VanillaInt)Control, Message, Param1, Param2);
+		return Control->CtlProc((VanillaInt)Control, Message, Param1, Param2);
 	}
 	return NULL;
 }

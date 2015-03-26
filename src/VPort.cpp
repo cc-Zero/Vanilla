@@ -628,35 +628,43 @@ VanillaControl VanillaPortDispatchMouseMessage(VanillaWindow Window, VanillaInt 
 			/*设置新控件*/
 			Window->MouseInControl = Control;
 			/*向旧控件发送鼠标离开的消息*/
-			VanillaControlSendMessage(OldControl, VM_MOUSEOUT, (VanillaInt)Control, NULL);
+			if (OldControl)
+			{
+				VanillaDefaultControlProc(OldControl, VM_MOUSEOUT, (VanillaInt)Control, NULL);
+			}
 			/*向新控件发送鼠标进入的消息*/
 			//VanillaControlSendMessage(Control, VM_MOUSEIN, (VanillaInt)OldControl, (VanillaInt)&pt2);
-			VanillaControlSendMessage(Control, VM_MOUSEIN, (VanillaInt)OldControl, NULL);
+			VanillaDefaultControlProc(Control, VM_MOUSEIN, (VanillaInt)OldControl, NULL);
 		}
 		/*向当前控件发送鼠标移动的消息*/
-		VanillaControlSendMessage(Control, VM_MOUSEMOVE, x1, y1);
+		VanillaDefaultControlProc(Control, VM_MOUSEMOVE, x1, y1);
 	}
 	else {
 		if (Action == 1) {
 			/*鼠标按键被按下*/
 			Window->ButtonDownControl[Button] = Control;
-			if (Control && Control->Class->Focusable && Window->FocusControl != Control) {
+			if (Control && Control->Focusable && Window->FocusControl != Control) {
 				VanillaControl OldControl = Window->FocusControl;
 				Window->FocusControl = Control;
-				VanillaControlSendMessage(OldControl, VM_KILLFOCUS, NULL, (VanillaInt)Control);
-				VanillaControlSendMessage(Control, VM_SETFOCUS, NULL, (VanillaInt)OldControl);
+				/*向旧控件发送失去焦点的消息*/
+				if (OldControl)
+				{
+					VanillaDefaultControlProc(OldControl, VM_KILLFOCUS, NULL, (VanillaInt)Control);
+				}
+				/*向新控件发送得到焦点的消息*/
+				VanillaDefaultControlProc(Control, VM_SETFOCUS, NULL, (VanillaInt)OldControl);
 			}
 		}
 		if (Control != NULL) {
             VanillaInt MsgList[2] [3] = { { VM_LBUTTONDOWN, VM_RBUTTONDOWN, VM_MBUTTONDOWN },
                                      { VM_LBUTTONUP, VM_RBUTTONUP, VM_MBUTTONUP } };
-			VanillaControlSendMessage(Control, MsgList [Action - 1] [Button], x1, y1);
+			VanillaDefaultControlProc(Control, MsgList[Action - 1][Button], x1, y1);
 		}
 		if (Action == 2) {
 			/*鼠标按键被弹起*/
 			if (Window->ButtonDownControl[Button] == Control) {
 				VanillaInt MsgList[] = { VM_LBUTTONCLK, VM_RBUTTONCLK, VM_MBUTTONCLK };
-				VanillaControlSendMessage(Control, MsgList[Button], x1, y1);
+				VanillaDefaultControlProc(Control, MsgList[Button], x1, y1);
 			}
 			Window->ButtonDownControl[Button] = NULL;
 		}
@@ -755,19 +763,19 @@ LRESULT CALLBACK VanillaPortWin32WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 	case WM_MOUSEWHEEL: {
 		/*鼠标滚动消息*/
 		if (Window->FocusControl) {
-			VanillaControlSendMessage(Window->FocusControl, VM_MOUSEWHEEL, (VanillaInt)(HIWORD(wParam) / 120), NULL);
+			VanillaDefaultControlProc(Window->FocusControl, VM_MOUSEWHEEL, (VanillaInt)(HIWORD(wParam) / 120), NULL);
 		}
 		break;
 	}
 	case WM_KEYDOWN: {
 		if (Window->FocusControl) {
-			VanillaControlSendMessage(Window->FocusControl, VM_KEYDOWN, (VanillaInt)wParam, NULL);
+			VanillaDefaultControlProc(Window->FocusControl, VM_KEYDOWN, (VanillaInt)wParam, NULL);
 		}
 		break;
 	}
 	case WM_KEYUP: {
 		if (Window->FocusControl) {
-			VanillaControlSendMessage(Window->FocusControl, VM_KEYUP, (VanillaInt)wParam, NULL);
+			VanillaDefaultControlProc(Window->FocusControl, VM_KEYUP, (VanillaInt)wParam, NULL);
 		}
 		break;
 	}
@@ -776,7 +784,7 @@ LRESULT CALLBACK VanillaPortWin32WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 		char Buffers[5];
 		VanillaPortUTF16ToUTF8(Buffers, 5, &Char, 1);
 		if (Window->FocusControl) {
-			VanillaControlSendMessage(Window->FocusControl, VM_CHAR, (VanillaInt)Buffers, NULL);
+			VanillaDefaultControlProc(Window->FocusControl, VM_CHAR, (VanillaInt)Buffers, NULL);
 		}
 		break;
 	}
@@ -802,12 +810,12 @@ VanillaVoid VanillaPortLinuxWindowProc(xcb_generic_event_t *event) {
             switch (bp->detail) {
             case 4:
                 if (Window->FocusControl) {
-                    VanillaControlSendMessage(Window->FocusControl, VM_MOUSEWHEEL, 1, NULL);
+					VanillaDefaultControlProc(Window->FocusControl, VM_MOUSEWHEEL, 1, NULL);
                 }
                 break;
             case 5:
                 if (Window->FocusControl) {
-                    VanillaControlSendMessage(Window->FocusControl, VM_MOUSEWHEEL, -1, NULL);
+					VanillaDefaultControlProc(Window->FocusControl, VM_MOUSEWHEEL, -1, NULL);
                 }
                 break;
             case 3:
@@ -843,7 +851,7 @@ VanillaVoid VanillaPortLinuxWindowProc(xcb_generic_event_t *event) {
             xcb_leave_notify_event_t *leave = (xcb_leave_notify_event_t *)event;
             REAL_WINDOW(leave->event);
             if (Window->MouseInControl) {
-                VanillaControlSendMessage(Window->MouseInControl, VM_MOUSEOUT, NULL, NULL);
+				VanillaDefaultControlProc(Window->MouseInControl, VM_MOUSEOUT, NULL, NULL);
                 Window->MouseInControl = NULL;
             }
             break;

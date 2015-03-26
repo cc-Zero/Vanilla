@@ -55,6 +55,7 @@
       <AdditionalIncludeDirectories>include/Skia/animator;include/Skia/c;include/Skia/config;include/Skia/core;include/Skia/device;include/Skia/effects;include/Skia/gpu;include/Skia/images;include/Skia/pathops;include/Skia/pipe;include/Skia/ports;include/Skia/svg;include/Skia/utils;include/Skia/vi</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -62,6 +63,9 @@
       <AdditionalLibraryDirectories>../Skia/out/Debug/;../Skia/out/Debug/obj/gyp/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -83,7 +87,6 @@
   <ItemGroup>
     <ClCompile Include="src\Controls\VanillaButton.cpp" />
     <ClCompile Include="src\Controls\VanillaLabel.cpp" />
-    <ClCompile Include="src\Controls\VControlRegister.cpp" />
     <ClCompile Include="src\DebugCode.cpp" />
     <ClCompile Include="src\Utils\VHashTable.cpp" />
     <ClCompile Include="src\Utils\VSkinDB.cpp" />
@@ -100,7 +103,6 @@
     <ClInclude Include="src\Controls\Include.h" />
     <ClInclude Include="src\Controls\VanillaButton.h" />
     <ClInclude Include="src\Controls\VanillaLabel.h" />
-    <ClInclude Include="src\Controls\VControlRegister.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\Utils\VHashTable.h" />
     <ClInclude Include="src\Utils\VSkinDB.h" />

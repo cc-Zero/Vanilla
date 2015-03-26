@@ -1,153 +1,97 @@
-// Vanilla按钮(控件)
+﻿// Vanilla按钮(控件)
 #include "Include.h"
 
 #define BUTTON_STATUS_NORMAL 0
 #define BUTTON_STATUS_HOVER  1
 #define BUTTON_STATUS_CLICK  2
 
-#define BUTTON_CLASS "Vanilla.Button"
-
-
-VanillaText VButton::OnCreate() {
-	this->Status = 0;
-	this->Style = 0;
-	this->StringFormat = NULL;
-	this->Title = NULL;
-	return BUTTON_CLASS;
-}
-
-VanillaButton VButton::Create(VanillaText Title, VanillaStringFormat StringFormat) {
-	this
-		->SetTitle(Title)
-		->SetStringFormat(StringFormat);
-	return this;
-}
-
-VanillaButton VButton::SetTitle(VanillaText Title) {
-	if (this->Title) {
-		delete this->Title;
-	}
-	this->Title = new VanillaString(Title);
-	return this;
-}
-
-VanillaButton VButton::SetStringFormat(VanillaStringFormat StringFormat) {
-	this->StringFormat = StringFormat;
-	return this;
-}
-
-VanillaButton VButton::SetStyle_Metro(VanillaColor Color [5]) {
-	for (VanillaInt i = 0; i < 5; i++) {
-		this->ButtonColor[i] = Color [i];
-	}
-	this->Style = VBS_METRO;
-	return this;
-}
-
-VanillaButton VButton::SetStyle_Image(VanillaImage Image[5]) {
-	for (VanillaInt i = 0; i < 5; i++) {
-		if (Image[i]) {
-			this->Image[i] = Image[i];
-		} else {
-			this->Image[i] = Image[0];
+/*按钮控件的回调函数*/
+VanillaInt VanillaButtonProc(VanillaInt ID, VanillaInt Message, VanillaInt Param1, VanillaInt Param2) {
+	VanillaControl Control = (VanillaControl)ID;
+	VanillaButton p = (VanillaButton)Control->ControlData;
+	switch (Message) {
+	case VM_LBUTTONDOWN:
+		p->Status = BUTTON_STATUS_CLICK;
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_LBUTTONUP:
+		p->Status = BUTTON_STATUS_HOVER;
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_MOUSEIN:
+		p->Status = BUTTON_STATUS_HOVER;
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_MOUSEOUT:
+		p->Status = BUTTON_STATUS_NORMAL;
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_SETFOCUS:
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_KILLFOCUS:
+		VanillaControlRedraw(Control, true);
+		break;
+	case VM_PAINT:
+		switch (p->Style) {
+		case VBS_METRO:
+			VanillaFillRect(Control->Graphics, p->ButtonColor[VanillaControlIsEnable(Control) ? p->Status : 3], 0, 0, Control->CRect.Width, Control->CRect.Height);
+			VanillaDrawString(Control->Graphics, p->StringFormat, String2Text(p->Title), &Control->CRect);
+			if (Control->Window->FocusControl == Control) {
+				VanillaDrawRect(Control->Graphics, p->ButtonColor[4], 1, 1, Control->CRect.Width - 1, Control->CRect.Height - 1, 2);
+			}
+			else {
+				VanillaDrawRect(Control->Graphics, p->ButtonColor[4], 0, 0, Control->CRect.Width, Control->CRect.Height, 1);
+			}
 		}
+		break;
 	}
-	this->Style = VBS_IMAGE;
-	return this;
+	return NULL;
 }
-
-VanillaText VButton::GetTitle() {
-	return String2Text(this->Title);
-}
-
-VanillaInt VButton::GetStyle() {
-	return this->Style;
-}
-
-VanillaVoid VButton::OnSetFocus(VanillaControl OldControl) {
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnKillFocus(VanillaControl OldControl) {
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnMouseIn(VanillaControl OldControl, VanillaPoint Point) {
-	this->Status = BUTTON_STATUS_HOVER;
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnMouseOut(VanillaControl OldControl) {
-	this->Status = BUTTON_STATUS_NORMAL;
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnMouseLDown(VanillaPoint Point) {
-	this->Status = BUTTON_STATUS_CLICK;
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnMouseLUp(VanillaPoint Point) {
-	this->Status = BUTTON_STATUS_HOVER;
-	this->Redraw(true);
-}
-
-VanillaVoid VButton::OnPaint(VanillaGraphics Graphics) {
-	VRect Rect;
-	this->GetFrameRect(&Rect);
-	switch (this->Style) {
-	case VBS_METRO:
-		VanillaFillRect(Graphics, this->ButtonColor[VanillaControlIsEnable(Control) ? this->Status : 3], 0, 0, Rect.Width, Rect.Height);
-		VanillaDrawString(Graphics, this->StringFormat, String2Text(this->Title), &Rect);
-		if (Control->Window->FocusControl == Control) {
-			VanillaDrawRect(Graphics, this->ButtonColor[4], 1, 1, Rect.Width - 1, Rect.Height - 1, 2);
-		}
-		else {
-			VanillaDrawRect(Graphics, this->ButtonColor[4], 0, 0, Rect.Width, Rect.Height, 1);
-		}
-	}
-}
-
-VanillaVoid VButton::OnDestroy() {
-	if (this->Title) {
-		delete this->Title;
-		this->Title = NULL;
-	}
-	this->Status = 0;
-	this->Style = 0;
-	this->StringFormat = NULL;
-	for (VanillaInt i = 0; i < 5; i++) {
-		this->ButtonColor [i] = 0;
-	}
-}
-
-VanillaControlClass VButton::Register() {
-	return BaseRegister(BUTTON_CLASS);
-}
-
 
 VAPI(VanillaControl) VanillaButtonCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaText Title, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled) {
-	VanillaButton Button = new VButton(ParentControl, Left, Top, Width, Height, Visible, Enabled);
-	Button->Create(Title, StringFormat);
-	return Button->Control;
+	VanillaButton p = (VanillaButton)malloc(sizeof(VButton));
+	if (p){
+		memset(p, 0, sizeof(VButton));
+		VanillaControl Control = VanillaControlCreate(ParentControl, Left, Top, Width, Height, p, NULL, Visible, Enabled, NULL);
+		if (Control) {
+			Control->CtlProc = &VanillaButtonProc;
+			p->Status = 0;
+			p->Style = 0;
+			p->StringFormat = StringFormat;
+			p->Title = new VanillaString(Title);
+			return Control;
+		}
+	}
+	return NULL;
 }
 
 VAPI(VanillaVoid) VanillaButtonSetStyle_Metro(VanillaControl Control, VanillaColor ButtonColor [5]) {
-	((VanillaButton)Control->ControlData)->SetStyle_Metro(ButtonColor);
+	VanillaButton p = (VanillaButton)Control->ControlData;
+	for (VanillaInt i = 0; i < 5; i++) {
+		p->ButtonColor[i] = ButtonColor[i];
+	}
+	p->Style = VBS_METRO;
 }
 
 VAPI(VanillaInt) VanillaButtonGetStyle(VanillaControl Control) {
-	return ((VanillaButton)Control->ControlData)->GetStyle();
+	return ((VanillaButton)(Control->ControlData))->Style;
 }
 
 VAPI(VanillaVoid) VanillaButtonSetTitle(VanillaControl Control, VanillaText Title) {
-	((VanillaButton)Control->ControlData)->SetTitle(Title);
+	VanillaButton p = (VanillaButton)Control->ControlData;
+	if (p->Title)
+	{
+		delete p->Title;
+	}
+	p->Title = new VanillaString(Title);
 }
 
 VAPI(VanillaVoid) VanillaButtonSetStringFormat(VanillaControl Control, VanillaStringFormat StringFormat) {
-	((VanillaButton)Control->ControlData)->SetStringFormat(StringFormat);
+	((VanillaButton)(Control->ControlData))->StringFormat = StringFormat;
 }
 
 VAPI(VanillaText) VanillaButtonGetTitle(VanillaControl Control) {
-	return ((VanillaButton)Control->ControlData)->GetTitle();
+	return String2Text(((VanillaButton)(Control->ControlData))->Title);
 }
+

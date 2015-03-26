@@ -7,28 +7,10 @@
 #include "VDrawing.h"
 #include "VGlobalFunction.h"
 
-std::map<VanillaString, VanillaControlClass> ControlClasses;
 VCtlEventProc DefEventProc = NULL;
 
-VAPI(VanillaControlClass) VanillaRegisterControlClass(VanillaText ClassName, VCtlProc CtlProc, VanillaBool Focusable, VanillaBool Virtual) {
-	VanillaControlClass Class;
-	if ((Class = ControlClasses[ClassName]) != NULL) {
-		return Class;
-	}
-	Class = new VControlClass;
-	Class->ClassName = ClassName;
-	Class->CtlProc = CtlProc;
-	Class->Focusable = Focusable;
-	Class->Virtual = Virtual;
-	ControlClasses [ClassName] = Class;
-	return Class;
-}
 
-VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaText ClassName, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct) {
-	VanillaControlClass Class = ControlClasses [ClassName];
-	if (ControlClasses [ClassName] == NULL) {
-		return NULL;
-	}
+VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct) {
 	if (ParentControl == NULL) {
 		return NULL;
 	}
@@ -40,7 +22,8 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaT
 	}
 
 	VanillaControl Control = new VControl;
-	Control->Class = Class;
+	Control->Focusable = true;
+	Control->Virtual = false;
 	Control->Alpha = 255;
 	Control->BindOwner = NULL;
 	Control->Window = RootControl ? ((VanillaWindow)(- (VanillaInt)ParentControl)) : ParentControl->Window;
@@ -63,6 +46,7 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaT
 	Control->Visible = Visible;
 	Control->MousePenetration = false;
 	MAKEVRECT(Control->Rect, Left, Top, Width, Height);
+	MAKEVRECT(Control->CRect, 0, 0, Width - 1, Height - 1);
 	Control->ParentControl = RootControl ? NULL : ParentControl;
 	if (!RootControl) {
 		if (Control->ParentControl->ChildControlEnd != NULL) {
@@ -76,7 +60,7 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaT
 	}
 	Control->DisabledCount = Control->ParentControl ? (Control->ParentControl->DisabledCount + ((Control->ParentControl->Enabled) ? 0 : 1)) : 0;
 	Control->InvisibleCount = Control->ParentControl ? (Control->ParentControl->InvisibleCount + ((Control->ParentControl->Visible) ? 0 : 1)) : 0;
-	if (!(RootControl || Class->Virtual)) {
+	if (!(RootControl || Control->Virtual)) {
 		Control->Graphics = VanillaCreateGraphicsInMemory(Width, Height);
 	} else {
 		Control->Graphics = NULL;
@@ -246,13 +230,14 @@ VAPI(VanillaVoid) VanillaControlMove(VanillaControl Control, VanillaInt Left, Va
 	VanillaControlGetRectOfWindow(Control, &OldRectOfWindow);
 	/*更新窗口矩形*/
 	MAKEVRECT(Control->Rect, Left, Top, Width, Height);
+	MAKEVRECT(Control->CRect, 0, 0, Width - 1, Height - 1);
 	if (Moved) {
 		/*通知控件位置被移动*/
 		VanillaControlSendMessage(Control, VM_MOVE, NULL, (VanillaInt)&OldRect.Left);
 	}
 	if (Sized) {
 		/*大小被更改*/
-		if (!Control->Class->Virtual) {
+		if (!Control->Virtual) {
 			/*销毁掉控件当前的图形*/
 			VanillaDestroyGraphics(Control->Graphics);
 			/*重新为控件创建图形*/
@@ -323,11 +308,15 @@ VAPI(VanillaControl) VanillaFindControlInControl(VanillaControl ParentControl, V
 	}
 	return NULL;
 }
-
+/**
+*通过VanillaControlSendMessage调用过来
+*/
 VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message, VanillaInt Param1, VanillaInt Param2) {
+	/*处理内核事件*/
 	switch (Message) {
 		case VM_SIZE: {
-			if (Control->Class->Virtual) {
+			/*大小被改变*/
+			if (Control->Virtual) {
 				return NULL;
 			}
 			VanillaDestroyGraphics(Control->Graphics_Gradient1);
@@ -339,7 +328,7 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 		}
 
 		case VM_UPDATE: {
-			if (Control->Class->Virtual) {
+			if (Control->Virtual) {
 				return NULL;
 			}
 			VRect RectOfWindow;
@@ -349,7 +338,7 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 		}
 
 		case VM_REDRAW: {
-			if (Control->Class->Virtual) {
+			if (Control->Virtual) {
 				return NULL;
 			}
 			VanillaGraphicsClear(Control->Graphics, 0);
@@ -380,12 +369,14 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 			break;
 		}
 	}
-	VanillaInt Result;
-	if (Control->CtlProc == NULL) {
-		Result = Control->Class->CtlProc(Control->ID, Message, Param1, Param2);
-	} else {
+	/*处理内核事件结束*/
+	/*通知控件处理*/
+	VanillaInt Result = 0;
+	if (Control->CtlProc != NULL) {
 		Result = Control->CtlProc(Control->ID, Message, Param1, Param2);
 	}
+	/*控件处理结束*/
+	/*通知用户处理*/
 	switch (Message) {
 		case VM_LBUTTONDOWN: {
 			VanillaControlTriggerEvent(Control, VE_LBTNDOWN, Param2, NULL, NULL);
@@ -447,5 +438,6 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 			break;
 		}
 	}
+	/*用户处理结束*/
 	return Result;
 }

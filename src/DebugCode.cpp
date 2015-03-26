@@ -48,8 +48,8 @@ VAPI(void) DLLDebug() {
 
 
 	VanillaSetWindowBkg(Window, BkgImage, 0, VBT_TENSILE | VBT_NOCOLORFILL);
-	VanillaSetWindowShadowColor(Window, RGB(0, 50, 120));
-	VanillaSetWindowComposite(Window, true);
+	//VanillaSetWindowShadowColor(Window, RGB(0, 50, 120));
+	//VanillaSetWindowComposite(Window, true);
 	VanillaSetWindowAlpha(Window, 216);
 
 
@@ -65,8 +65,11 @@ VAPI(void) DLLDebug() {
 	VanillaColor ButtonColor2[] = { ARGB(196, 80, 102, 178), ARGB(196, 80, 153, 153), ARGB(196, 80, 178, 102), ARGB(196, 200, 123, 123), ARGB(196, 255, 200, 200) };
 	Button1 = VanillaButtonCreate(VanillaGetWindowRootControl(Window), 340, 40, 90, 35, "I'm a Button", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
 	Button2 = VanillaButtonCreate(VanillaGetWindowRootControl(Window), 340, 90, 90, 35, "I'm a Button, too", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
+	Button3 = VanillaButtonCreate(VanillaGetWindowRootControl(Window), 340, 130, 90, 35, "I'm a Button, too", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
+
 	VanillaButtonSetStyle_Metro(Button1, ButtonColor1);
 	VanillaButtonSetStyle_Metro(Button2, ButtonColor2);
+	VanillaButtonSetStyle_Metro(Button3, ButtonColor1);
 	//VanillaButtonSetStyle_Metro(Button3, ButtonColor);
 
 

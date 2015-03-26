@@ -55,7 +55,10 @@ typedef struct VWindow
 	VanillaInt BackgroundType;				//背景类型
 
 	VWindowDefaultControl RootControl;		//根控件 整个窗口都为根控件
+	/*标题栏数据*/
 	VWindowDefaultControl Title;			//标题栏控件
+	VanillaStringFormat Title_StringFormat;	//标题文本格式
+	VanillaText Title_Title;				//标题
 
 	VanillaControl ButtonDownControl [3];	//
 	VanillaControl MouseInControl;			//鼠标所在的控件

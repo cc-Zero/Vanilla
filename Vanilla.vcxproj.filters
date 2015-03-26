@@ -54,9 +54,6 @@
     <ClCompile Include="src\Controls\VanillaLabel.cpp">
       <Filter>源文件\Controls</Filter>
     </ClCompile>
-    <ClCompile Include="src\Controls\VControlRegister.cpp">
-      <Filter>源文件\Controls</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utils\VHashTable.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
@@ -102,9 +99,6 @@
       <Filter>头文件\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\Controls\VanillaLabel.h">
-      <Filter>头文件\Controls</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Controls\VControlRegister.h">
       <Filter>头文件\Controls</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\VHashTable.h">
