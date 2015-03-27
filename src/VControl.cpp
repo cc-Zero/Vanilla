@@ -7,7 +7,8 @@
 #include "VDrawing.h"
 #include "VGlobalFunction.h"
 
-VCtlEventProc DefEventProc = NULL;
+
+VCtlEventProc DefEventProc = NULL;//全局默认回调函数
 
 
 VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaAny ControlData, VanillaInt CustomID, VanillaBool Visible, VanillaBool Enabled, VanillaAny CreateStruct) {
@@ -21,30 +22,38 @@ VAPI(VanillaControl) VanillaControlCreate(VanillaControl ParentControl, VanillaI
 		RootControl = false;
 	}
 
-	VanillaControl Control = new VControl;
+	VanillaControl Control = (VanillaControl)malloc(sizeof(VControl));
+	memset(Control, 0, sizeof(VControl));
 	Control->Focusable = true;
 	Control->Virtual = false;
-	Control->Alpha = 255;
+
+	Control->Alpha = 255;			//透明度
 	Control->BindOwner = NULL;
-	Control->Window = RootControl ? ((VanillaWindow)(- (VanillaInt)ParentControl)) : ParentControl->Window;
-	Control->CtlProc = NULL;
-	Control->Enabled = Enabled;
-	Control->EventProc = NULL;
+	Control->Window = RootControl ? ((VanillaWindow)(- (VanillaInt)ParentControl)) : ParentControl->Window;	//所在的窗口
+	Control->CtlProc = NULL;		//内核回调函数
+	Control->Enabled = Enabled;		//可用
+	Control->EventProc = NULL;		//用户回调
+									//渐变参数
 	Control->GradientAlpha = 0;
 	Control->Gradienting = false;
 	Control->GradientType = false;
 	Control->GradientUserData = NULL;
-	Control->ControlData = ControlData;
+
+	Control->ControlData = ControlData;//继承指针
 	Control->ID = (CustomID == 0) ? (VanillaInt)Control : CustomID;
+									//同级控件
 	Control->LastControl = NULL;
 	Control->NextControl = NULL;
+										//子控件
 	Control->ChildControlFirst = NULL;
 	Control->ChildControlEnd = NULL;
-	Control->Graphics = NULL;
-	Control->Graphics_Gradient1 = NULL;
+
+	Control->Graphics = NULL;			//缓存图形
+	Control->Graphics_Gradient1 = NULL;	//渐变缓存
 	Control->Graphics_Gradient2 = NULL;
-	Control->Visible = Visible;
-	Control->MousePenetration = false;
+	Control->Visible = Visible;			//可视
+	Control->MousePenetration = false;	//鼠标穿透
+										//保存控件区域
 	MAKEVRECT(Control->Rect, Left, Top, Width, Height);
 	MAKEVRECT(Control->CRect, 0, 0, Width - 1, Height - 1);
 	Control->ParentControl = RootControl ? NULL : ParentControl;
@@ -81,10 +90,13 @@ VAPI(VanillaInt) VanillaControlDestroy(VanillaControl Control) {
 		NextControl = NextControl->NextControl;
 		i += VanillaControlDestroy(ThisControl);
 	}
+	/*通知控件控件已被销毁*/
 	VanillaControlSendMessage(Control, VM_DESTROY, 0, 0);
+	/*销毁图形*/
 	VanillaDestroyGraphics(Control->Graphics);
 	VanillaDestroyGraphics(Control->Graphics_Gradient1);
 	VanillaDestroyGraphics(Control->Graphics_Gradient2);
+	/*移出链表中自身*/
 	if (Control->ParentControl) {
 		if (Control->ParentControl->ChildControlFirst == Control) {
 			Control->ParentControl->ChildControlFirst = Control->NextControl;
@@ -109,15 +121,18 @@ VAPI(VanillaInt) VanillaControlDestroy(VanillaControl Control) {
 		Control->Window->ButtonDownControl[2] = NULL;
 	}
 	if (Control->Window->CaptureControl == Control) {
+		/*当前俘获输入控件是欲销毁的控件*/
 		Control->Window->CaptureControl = NULL;
 	}
 	if (Control->Window->FocusControl == Control) {
+		/*当前焦点控件是欲销毁的控件*/
 		Control->Window->FocusControl = NULL;
 	}
 	if (Control->Window->MouseInControl == Control) {
+		/*鼠标当前所在控件是欲销毁的控件*/
 		Control->Window->MouseInControl = NULL;
 	}
-	delete Control;
+	free(Control);
 	return i + 1;
 }
 
@@ -153,6 +168,24 @@ VAPI(VanillaVoid) VanillaControlSetAlpha(VanillaControl Control, VanillaByte Alp
 
 VAPI(VanillaByte) VanillaControlGetAlpha(VanillaControl Control) {
 	return Control->Alpha;
+}
+
+VAPI(VanillaVoid) VanillaControlSetFocus(VanillaControl Control)
+{
+	VanillaControl OldControl = Control->Window->FocusControl;
+	Control->Window->FocusControl = Control;
+	/*向旧控件发送失去焦点的消息*/
+	if (OldControl)
+	{
+		VanillaDefaultControlProc(OldControl, VM_KILLFOCUS, NULL, (VanillaInt)Control);
+	}
+	/*向新控件发送得到焦点的消息*/
+	VanillaDefaultControlProc(Control, VM_SETFOCUS, NULL, (VanillaInt)OldControl);
+}
+
+VAPI(VanillaBool) VanillaControlGetFocus(VanillaControl Control)
+{
+	return Control->Window->FocusControl == Control;
 }
 
 VAPI(VanillaVoid) VanillaControlSetDefaultEventProc(VCtlEventProc EventProc) {
@@ -352,7 +385,6 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 			return Result;
 			break;
 		}
-
 		case VM_SETENABLED: {
 			if (Param2 != 0) {
 				Control->DisabledCount = Control->DisabledCount - Param2;

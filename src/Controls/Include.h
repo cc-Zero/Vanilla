@@ -12,4 +12,5 @@
 
 #include "VanillaLabel.h"
 #include "VanillaButton.h"
+#include "VanillaEdit.h"
 #endif	//__VANILLA_CONTROLS_INCLUDE_H__

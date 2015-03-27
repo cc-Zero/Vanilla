@@ -32,9 +32,9 @@ typedef struct VWindowDefaultControl
 	VanillaInt ID;
 } *VanillaWindowDefaultControl, _VWindowDefaultControl;
 
-#define VWDC_ROOT  0
-#define VWDC_TITLE 1
-#define VWDC_ICON  2
+#define VWDC_ROOT  0	//窗口根控件
+#define VWDC_TITLE 1	//标题控件
+#define VWDC_ICON  2	//图标控件
 
 
 typedef struct VWindow
@@ -63,7 +63,7 @@ typedef struct VWindow
 	VanillaControl ButtonDownControl [3];	//
 	VanillaControl MouseInControl;			//鼠标所在的控件
 	VanillaControl FocusControl;			//焦点控件
-	VanillaControl CaptureControl;
+	VanillaControl CaptureControl;			//俘获输入控件
 
 
 	VanillaBool FirstShow;					//可视

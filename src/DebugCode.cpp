@@ -13,6 +13,7 @@ int TestEventProc(VanillaWindow Window, VanillaControl Control, int Event, int P
 
 VanillaControl Label1, Label2;
 VanillaControl Button1, Button2, Button3;
+VanillaControl Edit1, Edit2;
 VanillaWindow Window;
 VanillaImage BkgImage;
 
@@ -60,6 +61,9 @@ VAPI(void) DLLDebug() {
 
 	Label1 = VanillaLabelCreate(VanillaGetWindowRootControl(Window), 470, 40, 80, 35, "Text With Shadow", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
 	Label2 = VanillaLabelCreate(VanillaGetWindowRootControl(Window), 470, 90, 80, 35, "Text Without Shadow", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE), true, true);
+
+	Edit1 = VanillaEditCreate(VanillaGetWindowRootControl(Window), 470, 150, 110, 24, "I'm a Edit1", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE), true, true);
+	Edit1 = VanillaEditCreate(VanillaGetWindowRootControl(Window), 470, 190, 110, 24, "I'm a Edit2", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE), true, true);
 
 	VanillaColor ButtonColor1[] = { ARGB(196, 0, 102, 178), ARGB(196, 0, 153, 153), ARGB(196, 0, 178, 102), ARGB(196, 123, 123, 123), ARGB(196, 255, 255, 255) };
 	VanillaColor ButtonColor2[] = { ARGB(196, 80, 102, 178), ARGB(196, 80, 153, 153), ARGB(196, 80, 178, 102), ARGB(196, 200, 123, 123), ARGB(196, 255, 200, 200) };

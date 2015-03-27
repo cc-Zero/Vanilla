@@ -1,6 +1,26 @@
 ﻿#ifndef __VANILLA_CORE_PORT_H__
 #define __VANILLA_CORE_PORT_H__
 
+
+typedef struct VTimer
+{
+#ifdef WIN32
+	UINT_PTR TimerID;//时钟id
+#elif defined LINUX
+
+#endif
+} *VanillaTimer, _VTimer;
+
+/**
+* 此函数用作创建定时器.
+* @param nElapse 时钟周期
+* @param lpTimerFunc 回调函数
+* @param Returns 成功返回定时器指针.
+*/
+VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, TIMERPROC lpTimerFunc);
+
+
+
 #define VanillaPort_ICONV std::string _VanillaPort_lpu;char* _VanillaPort_lpu_;int _VanillaPort_lpu_len;std::wstring _VanillaPort_lpw;wchar_t* _VanillaPort_lpw_;int _VanillaPort_lpw_len;
 
 #define VanillaPort_U2W(VanillaPort_lpu) ((_VanillaPort_lpu = (VanillaPort_lpu),_VanillaPort_lpu_=(char*)(_VanillaPort_lpu.c_str()),_VanillaPort_lpu_len = strlen(_VanillaPort_lpu_),_VanillaPort_lpw_len = VanillaPortUTF8ToUTF16(NULL, NULL, _VanillaPort_lpu_, _VanillaPort_lpu_len) + 1,_VanillaPort_lpw_ = (wchar_t*)malloc(_VanillaPort_lpw_len * 2),VanillaPortUTF8ToUTF16(_VanillaPort_lpw_, _VanillaPort_lpw_len, _VanillaPort_lpu_, _VanillaPort_lpu_len),_VanillaPort_lpw=_VanillaPort_lpw_,free(_VanillaPort_lpw_),_VanillaPort_lpw))

@@ -60,6 +60,9 @@
     <ClCompile Include="src\Utils\VTaskQueue.cpp">
       <Filter>源文件\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Controls\VanillaEdit.cpp">
+      <Filter>源文件\Controls</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\stdafx.h">
@@ -106,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="include\Skia.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Controls\VanillaEdit.h">
+      <Filter>头文件\Controls</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

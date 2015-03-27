@@ -3,13 +3,13 @@
 
 // Vanilla控件处理
 
-#define VM_CREATE	1
-#define VM_DESTROY	2
-#define VM_SETFOCUS	3
-#define VM_KILLFOCUS	4
+#define VM_CREATE	1//创建
+#define VM_DESTROY	2//销毁
+#define VM_SETFOCUS	3//得到焦点
+#define VM_KILLFOCUS	4//失去焦点
 #define VM_SETVISIBLE	5
 #define VM_SETENABLED	6
-#define VM_PAINT	7
+#define VM_PAINT	7//绘制
 #define VM_SIZE		8
 #define VM_MOVE		9
 #define VM_TIMER	10
@@ -64,49 +64,36 @@ typedef struct VControl
 {
 	// 链表 Begin
 	// 同级控件
-	VanillaControl LastControl;//上一个
-	VanillaControl NextControl;//下一个
+	VanillaControl LastControl;		//上一个
+	VanillaControl NextControl;		//下一个
 	// 子控件
 	VanillaControl ChildControlFirst;//第一个
-	VanillaControl ChildControlEnd;//最后一个
+	VanillaControl ChildControlEnd;	//最后一个
 	// 上级控件
 	VanillaControl ParentControl;
 	// 链表 End
 
-	// 自定义ID
-	VanillaInt ID;
+	VanillaInt ID;					// 自定义ID
 
 	// 控件属性 Begin
-	// 窗口
-	VanillaWindow Window;
-	// 可视
-	VanillaBool Visible;
-	// 可用
-	VanillaBool Enabled;
-	// 父层所有组件中不可用的层数
-	VanillaInt DisabledCount;
-	// 父层所有组件中不可视的层数
-	VanillaInt InvisibleCount;
-	// 鼠标穿透
-	VanillaBool MousePenetration;
-	// 透明度
-	VanillaByte Alpha;
-	// 控件回调函数(替换Class中的控件回调函数)
-	VCtlProc CtlProc;
-	// 事件回调函数
-	VCtlEventProc EventProc;
-	// 绑定控件 此控件可接收到NOTIFY消息
-	VanillaControl BindOwner;
-	// 控件类
-	//VanillaControlClass Class;
+	VanillaWindow Window;			//窗口
+	VanillaBool Visible;			//可视
+	VanillaBool Enabled;			//可用
+
+	VanillaInt DisabledCount;		// 父层所有组件中不可用的层数
+	VanillaInt InvisibleCount;		// 父层所有组件中不可视的层数
+	VanillaBool MousePenetration;	// 鼠标穿透
+	VanillaByte Alpha;				// 透明度
+	VCtlProc CtlProc;				// 控件回调函数
+	VCtlEventProc EventProc;		// 事件回调函数
+	VanillaControl BindOwner;		// 绑定控件 此控件可接收到NOTIFY消息
+
 	/*暂时不知道什么用*/
 	VanillaBool Focusable;
 	VanillaBool Virtual;
 
-	//矩形区域 相对于父窗口的
-	VRect Rect;
-	//矩形区域 客户区的
-	VRect CRect;
+	VRect Rect;						//矩形区域 相对于父窗口的
+	VRect CRect;					//矩形区域 客户区的
 
 	// 缓存图形
 	VanillaGraphics Graphics;
@@ -148,6 +135,7 @@ VAPI(VanillaInt) VanillaControlDestroy(VanillaControl Control);
 * @param Returns 返回控件处理重绘事件后的返回值(一般为0).
 */
 VAPI(VanillaInt) VanillaControlRedraw(VanillaControl Control, VanillaBool Update);
+VAPI(VanillaVoid) VanillaControlGradient(VanillaInt dwTime, VanillaInt dwGradient, VanillaBool bType);
 /**
 * 此函数用作设置Control可用状态.
 * @param Control VanillaControl对象
@@ -187,6 +175,18 @@ VAPI(VanillaVoid) VanillaControlSetAlpha(VanillaControl Control, VanillaByte Alp
 * @param Returns 返回Control透明度.
 */
 VAPI(VanillaByte) VanillaControlGetAlpha(VanillaControl Control);
+/**
+* 此函数用作设Control置焦点.
+* @param Control VanillaControl对象
+* @此函数没有返回值.
+*/
+VAPI(VanillaVoid) VanillaControlSetFocus(VanillaControl Control);
+/**
+* 此函数用作获取Control焦点状态.
+* @param Control VanillaControl对象
+* @param Returns 返回Control焦点状态.
+*/
+VAPI(VanillaBool) VanillaControlGetFocus(VanillaControl Control);
 /**
 * 此函数用作移动Control.
 * @param Control VanillaControl对象
@@ -267,7 +267,8 @@ VAPI(VanillaControl) VanillaFindControlInWindow(VanillaWindow Window, VanillaInt
 * @param Returns 返回寻找到的Control对象
 */
 VAPI(VanillaControl) VanillaFindControlInControl(VanillaControl ParentControl, VanillaInt x, VanillaInt y, VanillaInt *x1, VanillaInt *y1);
-/**控件的默认处理函数
+/**
+* 控件的默认处理函数
 */
 VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message, VanillaInt Param1, VanillaInt Param2);
 

@@ -29,24 +29,14 @@ std::map<xcb_window_t, VanillaPortWindow> WindowHashTable;
 __SK_FORCE_IMAGE_DECODER_LINKING;
 #endif
 
-typedef struct VPortWindow
-{
-    VanillaWindow Window;
-#ifdef WIN32
-	HWND hWnd;
-	HDC hDC;
-	bool Layered;
-#elif defined LINUX
-    cairo_t* cairo;
-    cairo_surface_t* cairo_surface;
-	bool mapped;
-	xcb_window_t xwindow;
-	xcb_pixmap_t xpixmap;
-	xcb_gcontext_t gc;
-	xcb_colormap_t xcolormap;
-#endif
-} *VanillaPortWindow, _VPortWindow;
 
+VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, TIMERPROC lpTimerFunc){
+	VanillaTimer p = (VanillaTimer)malloc(sizeof(VTimer));
+	if (p == 0) return 0;
+	memset(p, 0, sizeof(VTimer));
+	p->TimerID = SetTimer(0, 0, nElapse, lpTimerFunc);
+	return p;
+}
 
 #ifdef WIN32
 #define PROP_ID		(LPCWSTR)101
@@ -443,6 +433,7 @@ VanillaString VanillaPortGetWindowTitle(VanillaPortWindow PortWindow) {
 	}
 	return NULL;
 }
+
 VanillaVoid VanillaPortSetWindowVisible(VanillaPortWindow PortWindow, VanillaBool Visible) {
 	if (PortWindow) {
 #ifdef WIN32
