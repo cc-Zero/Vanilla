@@ -11,6 +11,24 @@ typedef struct VTimer
 #endif
 } *VanillaTimer, _VTimer;
 
+typedef struct VPortWindow
+{
+	VanillaWindow Window;
+#ifdef WIN32
+	HWND hWnd;
+	HDC hDC;
+	bool Layered;
+#elif defined LINUX
+	cairo_t* cairo;
+	cairo_surface_t* cairo_surface;
+	bool mapped;
+	xcb_window_t xwindow;
+	xcb_pixmap_t xpixmap;
+	xcb_gcontext_t gc;
+	xcb_colormap_t xcolormap;
+#endif
+} *VanillaPortWindow, _VPortWindow;
+
 /**
 * 此函数用作创建定时器.
 * @param nElapse 时钟周期

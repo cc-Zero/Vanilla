@@ -139,6 +139,15 @@ VAPI(VanillaInt) VanillaControlDestroy(VanillaControl Control) {
 VAPI(VanillaInt) VanillaControlRedraw(VanillaControl Control, VanillaBool Update) {
 	return VanillaControlSendMessage(Control, VM_REDRAW, (VanillaInt)Update, NULL);
 }
+/*渐变更新*/
+VAPI(VanillaVoid) VanillaControlGradient(VanillaControl Control, VanillaInt dwTime, VanillaInt dwGradient, VanillaBool bType)
+{
+	if (dwTime <= 0){ dwTime = 10; }
+	if (dwGradient <= 0){ dwGradient = 10; }
+	if (Control->Graphics_Gradient1 == 0){ Control->Graphics_Gradient1 = VanillaCreateGraphicsInMemory(Control->CRect.Width, Control->CRect.Height); }
+	if (Control->Graphics_Gradient2 == 0){ Control->Graphics_Gradient2 = VanillaCreateGraphicsInMemory(Control->CRect.Width, Control->CRect.Height); }
+
+}
 
 VAPI(VanillaVoid) VanillaControlSetEnable(VanillaControl Control, VanillaBool Enabled) {
 	if (Control->Enabled != Enabled) {
@@ -172,15 +181,17 @@ VAPI(VanillaByte) VanillaControlGetAlpha(VanillaControl Control) {
 
 VAPI(VanillaVoid) VanillaControlSetFocus(VanillaControl Control)
 {
-	VanillaControl OldControl = Control->Window->FocusControl;
-	Control->Window->FocusControl = Control;
-	/*向旧控件发送失去焦点的消息*/
-	if (OldControl)
-	{
-		VanillaDefaultControlProc(OldControl, VM_KILLFOCUS, NULL, (VanillaInt)Control);
+	if (Control->Focusable){
+		VanillaControl OldControl = Control->Window->FocusControl;
+		Control->Window->FocusControl = Control;
+		/*向旧控件发送失去焦点的消息*/
+		if (OldControl)
+		{
+			VanillaDefaultControlProc(OldControl, VM_KILLFOCUS, NULL, (VanillaInt)Control);
+		}
+		/*向新控件发送得到焦点的消息*/
+		VanillaDefaultControlProc(Control, VM_SETFOCUS, NULL, (VanillaInt)OldControl);
 	}
-	/*向新控件发送得到焦点的消息*/
-	VanillaDefaultControlProc(Control, VM_SETFOCUS, NULL, (VanillaInt)OldControl);
 }
 
 VAPI(VanillaBool) VanillaControlGetFocus(VanillaControl Control)

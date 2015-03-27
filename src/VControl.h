@@ -89,8 +89,8 @@ typedef struct VControl
 	VanillaControl BindOwner;		// 绑定控件 此控件可接收到NOTIFY消息
 
 	/*暂时不知道什么用*/
-	VanillaBool Focusable;
-	VanillaBool Virtual;
+	VanillaBool Focusable;			//可否获取焦点
+	VanillaBool Virtual;			//虚拟控件 不分配图形
 
 	VRect Rect;						//矩形区域 相对于父窗口的
 	VRect CRect;					//矩形区域 客户区的
@@ -135,7 +135,16 @@ VAPI(VanillaInt) VanillaControlDestroy(VanillaControl Control);
 * @param Returns 返回控件处理重绘事件后的返回值(一般为0).
 */
 VAPI(VanillaInt) VanillaControlRedraw(VanillaControl Control, VanillaBool Update);
-VAPI(VanillaVoid) VanillaControlGradient(VanillaInt dwTime, VanillaInt dwGradient, VanillaBool bType);
+/**
+* 此函数用作渐变更新VanillaControl(控件)对象.
+* 渐变更新,类内部使用.调用本方法后,OnPaint事件被触发,然后借助时钟绘制出渐变效果(将会使用时钟ID:-1),注意,本方法是用异步实现的,而且无法终止
+* @param Control VanillaControl对象
+* @param dwTime 每两次更新间隔毫秒数,默认为10
+* @param dwGradient 每两次更新间渐变幅度,默认为10
+* @param bType 真:在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)|||假:慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
+* @param Returns 返回控件处理重绘事件后的返回值(一般为0).
+*/
+VAPI(VanillaVoid) VanillaControlGradient(VanillaControl Control, VanillaInt dwTime, VanillaInt dwGradient, VanillaBool bType);
 /**
 * 此函数用作设置Control可用状态.
 * @param Control VanillaControl对象
