@@ -101,10 +101,11 @@ typedef struct VControl
 	VanillaGraphics Graphics_Gradient1;
 	VanillaGraphics Graphics_Gradient2;
 	// 渐变参数
-	VanillaBool Gradienting;
-	VanillaReal GradientAlpha;
+	VanillaBool Gradienting;		//渐变完成
+	VanillaReal GradientAlpha;		//渐变透明度
 	VanillaInt GradientUserData;
 	VanillaBool GradientType;
+	VanillaTimer GradientTimer;		//渐变时钟
 	// 控件属性 End
 
 	VanillaAny ControlData;

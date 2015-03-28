@@ -5,6 +5,7 @@
 #include "VWindow.h"
 #include "VControl.h"
 #include "VDrawing.h"
+#include "VPort.h"
 #include "VGlobalFunction.h"
 
 
@@ -141,12 +142,22 @@ VAPI(VanillaInt) VanillaControlRedraw(VanillaControl Control, VanillaBool Update
 }
 /*渐变更新*/
 VAPI(VanillaVoid) VanillaControlGradient(VanillaControl Control, VanillaInt dwTime, VanillaInt dwGradient, VanillaBool bType)
-{
+{//真:在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)|||假:慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
 	if (dwTime <= 0){ dwTime = 10; }
 	if (dwGradient <= 0){ dwGradient = 10; }
+	/*第一次渐变 初始化缓冲图形*/
 	if (Control->Graphics_Gradient1 == 0){ Control->Graphics_Gradient1 = VanillaCreateGraphicsInMemory(Control->CRect.Width, Control->CRect.Height); }
 	if (Control->Graphics_Gradient2 == 0){ Control->Graphics_Gradient2 = VanillaCreateGraphicsInMemory(Control->CRect.Width, Control->CRect.Height); }
-
+	if (Control->Gradienting)
+	{
+		//上次渐变未完成
+	}
+	/*重绘到渐变缓存1*/
+	VanillaGraphicsClear(Control->Graphics_Gradient1, 0);
+	VanillaGraphicsClear(Control->Graphics, 0);
+	Control->CtlProc(Control->ID, VM_PAINT, NULL, (VanillaInt)Control->Graphics_Gradient1);
+	/*创建时钟*/
+	Control->GradientTimer = VanillaPortCreateTimer(dwTime, Control, dwGradient, NULL);
 }
 
 VAPI(VanillaVoid) VanillaControlSetEnable(VanillaControl Control, VanillaBool Enabled) {
@@ -394,6 +405,34 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 				VanillaControlSendMessage(Control, VM_UPDATE, 0, 0);
 			}
 			return Result;
+			break;
+		}
+		case VM_TIMER:{
+			/*渐变时钟*/
+			//渐变启动时将图形绘制到渐变图形1上
+			//真:在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)|||假:慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
+			Control->GradientAlpha = 255;//计算本次的透明度
+			if (Control->GradientAlpha > 255){ Control->GradientAlpha = 255; }//透明度最多255
+			if (Control->GradientType){
+				//在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)
+				//VanillaAlphaBlend(Control->Graphics_Gradient2, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics, 0, 0, 255);
+			}
+			else
+			{
+				//慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
+				//VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255 - (VanillaByte)Control->GradientAlpha);
+
+			}
+			VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, 0);
+			/*刷新缓存*/
+			/*刷新显示*/
+			VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
+			if (Control->GradientAlpha == 255)
+			{
+				/*销毁时钟*/
+				VanillaPortestroyTimer(Control->GradientTimer);
+				Control->GradientTimer = 0;
+			}
 			break;
 		}
 		case VM_SETENABLED: {

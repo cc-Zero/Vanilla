@@ -40,7 +40,7 @@ typedef const char* VanillaText;
 
 typedef std::string VanillaString;
 
-typedef SkScalar VanillaReal;
+typedef float VanillaReal;
 
 typedef int32_t VanillaInt;
 
@@ -79,6 +79,8 @@ typedef struct VSkinDB *VanillaSkinDB, _VSkinDB;
 typedef struct VWindow *VanillaWindow, _VWindow;
 
 typedef struct VPortWindow *VanillaPortWindow, _VPortWindow;
+
+typedef struct VTimer *VanillaTimer, _VTimer;
 
 typedef struct VPortGraphics *VanillaPortGraphics, _VPortGraphics;
 

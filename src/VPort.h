@@ -4,6 +4,12 @@
 
 typedef struct VTimer
 {
+	VanillaTimer LastTimer;		//上一个
+	VanillaTimer NextTimer;		//下一个
+
+	VanillaControl Control;
+	VanillaInt Param1;
+	VanillaInt Param2;
 #ifdef WIN32
 	UINT_PTR TimerID;//时钟id
 #elif defined LINUX
@@ -32,11 +38,11 @@ typedef struct VPortWindow
 /**
 * 此函数用作创建定时器.
 * @param nElapse 时钟周期
-* @param lpTimerFunc 回调函数
+* @param Control 通知的控件
 * @param Returns 成功返回定时器指针.
 */
-VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, TIMERPROC lpTimerFunc);
-
+VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, VanillaControl Control, VanillaInt Param1, VanillaInt Param2);
+VanillaVoid VanillaPortestroyTimer(VanillaTimer Timer);
 
 
 #define VanillaPort_ICONV std::string _VanillaPort_lpu;char* _VanillaPort_lpu_;int _VanillaPort_lpu_len;std::wstring _VanillaPort_lpw;wchar_t* _VanillaPort_lpw_;int _VanillaPort_lpw_len;
