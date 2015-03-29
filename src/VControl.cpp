@@ -419,32 +419,35 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 			break;
 		}
 		case VM_TIMER:{
-			/*渐变时钟*/
-			Control->GradientAlpha += (VanillaReal)(Param1*2.55);//计算本次的透明度
-			if (Control->GradientAlpha > 255){ Control->GradientAlpha = 255; }//透明度最多255
-			if (Control->GradientType){
-				//在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)
-				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255);
-			}
-			else
+			if (Param2 == Control->GradientTimer)
 			{
-				//慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
-				VanillaGraphicsClear(Control->Graphics, 0);
-				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255 - (VanillaByte)Control->GradientAlpha);
-			}
-			VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, (VanillaByte)Control->GradientAlpha);
-			/*刷新缓存*/
-			/*刷新显示*/
-			VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
-			if (Control->GradientAlpha == 255)
-			{
-				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
+				/*渐变时钟*/
+				Control->GradientAlpha += (VanillaReal)(Param1*2.55);//计算本次的透明度
+				if (Control->GradientAlpha > 255){ Control->GradientAlpha = 255; }//透明度最多255
+				if (Control->GradientType){
+					//在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255);
+				}
+				else
+				{
+					//慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
+					VanillaGraphicsClear(Control->Graphics, 0);
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255 - (VanillaByte)Control->GradientAlpha);
+				}
+				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, (VanillaByte)Control->GradientAlpha);
+				/*刷新缓存*/
+				/*刷新显示*/
 				VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
-				/*销毁时钟*/
-				VanillaPortestroyTimer(Control->GradientTimer);
-				Control->GradientTimer = 0;
-				Control->GradientAlpha = 0;
-				Control->Gradienting = false;
+				if (Control->GradientAlpha == 255)
+				{
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
+					VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
+					/*销毁时钟*/
+					VanillaPortestroyTimer(Control->GradientTimer);
+					Control->GradientTimer = 0;
+					Control->GradientAlpha = 0;
+					Control->Gradienting = false;
+				}
 			}
 			break;
 		}

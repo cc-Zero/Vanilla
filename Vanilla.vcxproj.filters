@@ -25,6 +25,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\XML">
+      <UniqueIdentifier>{c0c28465-0e21-4136-b892-667224bbfc01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\XML">
+      <UniqueIdentifier>{6a4bf720-efc8-4eff-8244-a0fef3cf32d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DebugCode.cpp">
@@ -62,6 +68,36 @@
     </ClCompile>
     <ClCompile Include="src\Controls\VanillaEdit.cpp">
       <Filter>源文件\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-attr.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-entity.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-file.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-get.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-index.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-node.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-private.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-search.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-set.c">
+      <Filter>源文件\XML</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XML\mxml-string.c">
+      <Filter>源文件\XML</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +148,15 @@
     </ClInclude>
     <ClInclude Include="src\Controls\VanillaEdit.h">
       <Filter>头文件\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XML\config.h">
+      <Filter>头文件\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XML\mxml.h">
+      <Filter>头文件\XML</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XML\mxml-private.h">
+      <Filter>头文件\XML</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

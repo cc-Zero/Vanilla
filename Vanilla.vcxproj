@@ -97,6 +97,16 @@
     <ClCompile Include="src\VGlobalFunction.cpp" />
     <ClCompile Include="src\VPort.cpp" />
     <ClCompile Include="src\VWindow.cpp" />
+    <ClCompile Include="src\XML\mxml-attr.c" />
+    <ClCompile Include="src\XML\mxml-entity.c" />
+    <ClCompile Include="src\XML\mxml-file.c" />
+    <ClCompile Include="src\XML\mxml-get.c" />
+    <ClCompile Include="src\XML\mxml-index.c" />
+    <ClCompile Include="src\XML\mxml-node.c" />
+    <ClCompile Include="src\XML\mxml-private.c" />
+    <ClCompile Include="src\XML\mxml-search.c" />
+    <ClCompile Include="src\XML\mxml-set.c" />
+    <ClCompile Include="src\XML\mxml-string.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Skia.h" />
@@ -115,6 +125,9 @@
     <ClInclude Include="src\VPort.h" />
     <ClInclude Include="src\VStruct.h" />
     <ClInclude Include="src\VWindow.h" />
+    <ClInclude Include="src\XML\config.h" />
+    <ClInclude Include="src\XML\mxml-private.h" />
+    <ClInclude Include="src\XML\mxml.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
