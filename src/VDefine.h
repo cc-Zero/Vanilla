@@ -1,4 +1,4 @@
-#ifndef __VANILLA_CORE_DEFINE_H__
+ï»¿#ifndef __VANILLA_CORE_DEFINE_H__
 #define __VANILLA_CORE_DEFINE_H__
 // Vanilla Defines
 
@@ -7,11 +7,11 @@
 #define DEBUG_PUTPNG(BITMAP, FILE) SkASSERT(SkImageEncoder::EncodeFile(FILE, BITMAP, SkImageEncoder::kPNG_Type, 100));
 
 
-/*±àÒëÅäÖÃ*/
-//äÖÈ¾ºó¶Ë
-//#define DRAW_SKIA
+/*ç¼–è¯‘é…ç½®*/
+//æ¸²æŸ“åç«¯
+#define DRAW_SKIA
 //#define DRAW_AGG
-#define DRAW_GDI
+//#define DRAW_GDI
 //#define DRAW_CAIRO
 
 

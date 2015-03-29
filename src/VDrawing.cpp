@@ -289,7 +289,7 @@ VAPI(VanillaVoid) VanillaAlphaBlend(VanillaGraphics Dest, VanillaInt x, VanillaI
 	Dest->Paint.reset();
 	Dest->Paint.setAlpha(Alpha);
 	SkIRect Rect = SkIRect::MakeXYWH(xSrc, ySrc, Width, Height);
-	Dest->Canvas.drawBitmapRect(Src->Bitmap, &Rect, SkRect::MakeXYWH((VanillaReal)x, (VanillaReal)y, (VanillaReal)Width, (VanillaReal)Height), NULL);
+	Dest->Canvas.drawBitmapRect(Src->Bitmap, &Rect, SkRect::MakeXYWH((VanillaReal)x, (VanillaReal)y, (VanillaReal)Width, (VanillaReal)Height), &Dest->Paint);
 #elif defined DRAW_GDI
 	BLENDFUNCTION bf;
 	bf.BlendOp = AC_SRC_OVER;     
