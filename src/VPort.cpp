@@ -28,68 +28,40 @@ std::map<xcb_window_t, VanillaPortWindow> WindowHashTable;
 
 __SK_FORCE_IMAGE_DECODER_LINKING;
 #endif
-/*全局时钟链表*/
-VanillaTimer TimerList = NULL;
-VOID CALLBACK VanillaPortTimerProc(HWND hwnd, UINT message, UINT iTimerID, DWORD dwTime)
+/*全局时钟回调链表*/
+
+/*生成时钟回调*/
+void *VanillaPortMarkTimerProc(VanillaControl Control, VanillaInt Param1)
 {
-	VanillaTimer NextTimer = TimerList;
-	while (NextTimer->TimerID != iTimerID)
-	{
-		NextTimer = TimerList->NextTimer;
-	}
-	if (NextTimer->TimerID == iTimerID)
-	{
-		/*给控件发送*/
-		VanillaDefaultControlProc(NextTimer->Control, VM_TIMER, NextTimer->Param1, NextTimer->Param2);
-	}
+/*
+	push ebp
+	mov ebp,esp
+	push dword [ebp+0x10]	;时钟id
+	push 0x1000000			;参数1
+	push 10					;VM_TIMER
+	push 0x1000000			;控件指针
+	mov eax,111				;VanillaDefaultControlProc
+	call eax
+	add esp,10h
+	mov esp,ebp
+	ret 10h
+*/
+	unsigned char b[33] = { 85, 137, 229, 255, 117, 16, 104, 0, 0, 0, 1, 106, 10, 104, 0, 0, 0, 1, 184, 111, 0, 0, 0, 255, 208, 131, 196, 16, 137, 236, 194, 16, 0 };
+	int p = (int)&VanillaDefaultControlProc;
+	memcpy(b + 7, &Param1, 4);
+	memcpy(b + 14, &Control, 4);
+	memcpy(b + 19, &p, 4);
+	void *f = malloc(33);
+	memcpy(f, b, 33);
+	return f;
 }
-VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, VanillaControl Control,VanillaInt Param1, VanillaInt Param2){
-	VanillaTimer p = (VanillaTimer)malloc(sizeof(VTimer));
-	if (p == 0) return 0;
-	memset(p, 0, sizeof(VTimer));
-	if (!TimerList)
-	{
-		TimerList = p;
-	}
-	else
-	{
-		VanillaTimer NextTimer = TimerList;
-		/*到链表尾*/
-		while (NextTimer->NextTimer)
-		{
-			NextTimer = TimerList->NextTimer;
-		}
-		/*添加到链表尾*/
-		NextTimer->NextTimer = p;
-		p->LastTimer = NextTimer;
-	}
-	p->Control = Control;
-	p->Param1 = Param1;
-	p->Param2 = Param2;
-	p->TimerID = SetTimer(0, 0, nElapse, VanillaPortTimerProc);
-	return p;
+VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, VanillaControl Control,VanillaInt Param1){
+	void *p = VanillaPortMarkTimerProc(Control, Param1);
+	return SetTimer(0, 0, nElapse, (TIMERPROC)p);
 }
 VanillaVoid VanillaPortestroyTimer(VanillaTimer Timer)
 {
-	VanillaTimer NextTimer = TimerList;
-	while (NextTimer != Timer)
-	{
-		NextTimer = TimerList->NextTimer;
-	}
-	if (NextTimer == Timer)
-	{
-		KillTimer(0, Timer->TimerID);
-		if (NextTimer->NextTimer)
-		{//不再链表结尾
-			NextTimer->NextTimer->LastTimer = NextTimer->LastTimer;
-			NextTimer->LastTimer->NextTimer = NextTimer->NextTimer;
-		}
-		else
-		{
-			NextTimer->LastTimer->NextTimer = NULL;
-		}
-		free(Timer);
-	}
+		KillTimer(0, Timer);
 }
 #ifdef WIN32
 #define PROP_ID		(LPCWSTR)101
@@ -273,6 +245,7 @@ VAPI(VanillaInt) VanillaPortUTF8ToUTF16(wchar_t* Output, VanillaInt OutputSize, 
 
 VanillaBool VanillaPortInitialize() {
 #ifdef WIN32
+	VanillaPortMarkTimerProc((VanillaControl)12,12);
 	return true;
 #elif defined LINUX
 	connection = xcb_connect(NULL, NULL);

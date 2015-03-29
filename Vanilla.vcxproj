@@ -54,7 +54,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;VANILLA_EXPORTS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include/Skia/animator;include/Skia/c;include/Skia/config;include/Skia/core;include/Skia/device;include/Skia/effects;include/Skia/gpu;include/Skia/images;include/Skia/pathops;include/Skia/pipe;include/Skia/ports;include/Skia/svg;include/Skia/utils;include/Skia/vi</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>

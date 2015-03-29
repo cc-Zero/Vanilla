@@ -12,19 +12,19 @@ VanillaInt VanillaButtonProc(VanillaInt ID, VanillaInt Message, VanillaInt Param
 	switch (Message) {
 	case VM_LBUTTONDOWN:
 		p->Status = BUTTON_STATUS_CLICK;
-		VanillaControlRedraw(Control, true);
+		VanillaControlGradient(Control, 5, 7, 0);
 		break;
 	case VM_LBUTTONUP:
 		p->Status = BUTTON_STATUS_HOVER;
-		VanillaControlRedraw(Control, true);
+		VanillaControlGradient(Control, 5, 7, 0);
 		break;
 	case VM_MOUSEIN:
 		p->Status = BUTTON_STATUS_HOVER;
-		VanillaControlRedraw(Control, true);
+		VanillaControlGradient(Control, 5, 7, 0);
 		break;
 	case VM_MOUSEOUT:
 		p->Status = BUTTON_STATUS_NORMAL;
-		VanillaControlRedraw(Control, true);
+		VanillaControlGradient(Control, 5, 7, 0);
 		break;
 	case VM_SETFOCUS:
 		VanillaControlRedraw(Control, true);
@@ -33,15 +33,16 @@ VanillaInt VanillaButtonProc(VanillaInt ID, VanillaInt Message, VanillaInt Param
 		VanillaControlRedraw(Control, true);
 		break;
 	case VM_PAINT:
+		VanillaGraphics Graphics = (VanillaGraphics)Param2;
 		switch (p->Style) {
 		case VBS_METRO:
-			VanillaFillRect(Control->Graphics, p->ButtonColor[VanillaControlIsEnable(Control) ? p->Status : 3], 0, 0, Control->CRect.Width, Control->CRect.Height);
-			VanillaDrawString(Control->Graphics, p->StringFormat, String2Text(p->Title), &Control->CRect);
+			VanillaFillRect(Graphics, p->ButtonColor[VanillaControlIsEnable(Control) ? p->Status : 3], 0, 0, Control->CRect.Width, Control->CRect.Height);
+			VanillaDrawString(Graphics, p->StringFormat, String2Text(p->Title), &Control->CRect);
 			if (Control->Window->FocusControl == Control) {
-				VanillaDrawRect(Control->Graphics, p->ButtonColor[4], 1, 1, Control->CRect.Width - 1, Control->CRect.Height - 1, 2);
+				VanillaDrawRect(Graphics, p->ButtonColor[4], 1, 1, Control->CRect.Width - 2, Control->CRect.Height - 2, 2);
 			}
 			else {
-				VanillaDrawRect(Control->Graphics, p->ButtonColor[4], 0, 0, Control->CRect.Width, Control->CRect.Height, 1);
+				VanillaDrawRect(Graphics, p->ButtonColor[4], 0, 0, Control->CRect.Width, Control->CRect.Height, 1);
 			}
 		}
 		break;
@@ -60,7 +61,6 @@ VAPI(VanillaControl) VanillaButtonCreate(VanillaControl ParentControl, VanillaIn
 			p->Style = 0;
 			p->StringFormat = StringFormat;
 			p->Title = new VanillaString(Title);
-			Control->Alpha = 100;
 			return Control;
 		}
 	}

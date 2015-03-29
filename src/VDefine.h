@@ -81,7 +81,7 @@ typedef struct VWindow *VanillaWindow, _VWindow;
 
 typedef struct VPortWindow *VanillaPortWindow, _VPortWindow;
 
-typedef struct VTimer *VanillaTimer, _VTimer;
+typedef UINT_PTR VanillaTimer;
 
 typedef struct VPortGraphics *VanillaPortGraphics, _VPortGraphics;
 

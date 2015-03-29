@@ -296,7 +296,7 @@ VAPI(VanillaVoid) VanillaAlphaBlend(VanillaGraphics Dest, VanillaInt x, VanillaI
 	bf.BlendFlags = 0;
 	bf.AlphaFormat = 1;
 	bf.SourceConstantAlpha = Alpha;
-	AlphaBlend(Dest->hdc, x, y, Width, Height, Src->hdc, xSrc, ySrc, Width, Height, bf);
+	BOOL a=AlphaBlend(Dest->hdc, x, y, Width, Height, Src->hdc, xSrc, ySrc, Width, Height, bf);
 #endif
 
 }

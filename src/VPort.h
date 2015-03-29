@@ -2,21 +2,6 @@
 #define __VANILLA_CORE_PORT_H__
 
 
-typedef struct VTimer
-{
-	VanillaTimer LastTimer;		//上一个
-	VanillaTimer NextTimer;		//下一个
-
-	VanillaControl Control;
-	VanillaInt Param1;
-	VanillaInt Param2;
-#ifdef WIN32
-	UINT_PTR TimerID;//时钟id
-#elif defined LINUX
-
-#endif
-} *VanillaTimer, _VTimer;
-
 typedef struct VPortWindow
 {
 	VanillaWindow Window;
@@ -41,7 +26,7 @@ typedef struct VPortWindow
 * @param Control 通知的控件
 * @param Returns 成功返回定时器指针.
 */
-VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, VanillaControl Control, VanillaInt Param1, VanillaInt Param2);
+VanillaTimer VanillaPortCreateTimer(VanillaInt nElapse, VanillaControl Control, VanillaInt Param1);
 VanillaVoid VanillaPortestroyTimer(VanillaTimer Timer);
 
 

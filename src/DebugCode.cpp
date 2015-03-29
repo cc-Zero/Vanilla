@@ -65,7 +65,7 @@ VAPI(void) DLLDebug() {
 	Edit1 = VanillaEditCreate(VanillaGetWindowRootControl(Window), 470, 150, 110, 24, "I'm a Edit1", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE), true, true);
 	Edit1 = VanillaEditCreate(VanillaGetWindowRootControl(Window), 470, 190, 110, 24, "I'm a Edit2", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE), true, true);
 
-	VanillaColor ButtonColor1[] = { ARGB(196, 0, 102, 178), ARGB(196, 0, 153, 153), ARGB(196, 0, 178, 102), ARGB(196, 123, 123, 123), ARGB(196, 255, 255, 255) };
+	VanillaColor ButtonColor1[] = { ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 0), ARGB(255, 0, 255, 0), ARGB(196, 123, 123, 123), ARGB(196, 255, 255, 255) };
 	VanillaColor ButtonColor2[] = { ARGB(196, 80, 102, 178), ARGB(196, 80, 153, 153), ARGB(196, 80, 178, 102), ARGB(196, 200, 123, 123), ARGB(196, 255, 200, 200) };
 	Button1 = VanillaButtonCreate(VanillaGetWindowRootControl(Window), 340, 40, 90, 35, "I'm a Button", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
 	Button2 = VanillaButtonCreate(VanillaGetWindowRootControl(Window), 340, 90, 90, 35, "I'm a Button, too", VanillaCreateStringFormat("文泉驿微米黑", 12, ARGB(255, 0, 0, 0), ARGB(255, 255, 255, 255), VTS_ALIGN_CENTER | VTS_VALIGN_MIDDLE | VTS_SHADOW), true, true);
