@@ -2,6 +2,16 @@
 #define __VANILLA_CORE_DRAWING_H__
 // Vanilla Drawing Functions
 
+#ifdef DRAW_SKIA
+#include "../include/Skia.h"
+#elif defined DRAW_GDI
+#include <Windows.h>
+#include <wingdi.h>
+#pragma comment(lib, "Msimg32.lib")  
+#pragma comment(lib, "Gdiplus.lib")
+#endif
+
+
 #define VTS_BOLD 1				//粗体
 #define VTS_ITALIC 2			//斜体
 #define VTS_ALIGN_LEFT 0		//水平居左
@@ -10,10 +20,14 @@
 #define VTS_VALIGN_TOP 0		//垂直顶部对齐
 #define VTS_VALIGN_MIDDLE 16	//垂直居中对齐
 #define VTS_VALIGN_BOTTOM 32	//垂直底部对齐
-#define VTS_SHADOW 64
-
+#define VTS_SHADOW 64			//阴影
+/*图像*/
 typedef struct VImage {
+#ifdef DRAW_SKIA
 	SkBitmap Bitmap;
+#elif defined DRAW_GDI
+	void *image;
+#endif
 	VanillaInt Width;
 	VanillaInt Height;
 }*VanillaImage, _VImage;
@@ -28,37 +42,45 @@ typedef struct VPortGraphics
 	cairo_surface_t* cairo_surface;
 #endif
 } *VanillaPortGraphics, _VPortGraphics;
-
+/*图形*/
 typedef struct VGraphics {
+	VanillaPortGraphics PortGraphics;
+#ifdef DRAW_SKIA
 	SkCanvas Canvas;
 	char Buffers[8]; // fixme : Skia's memory-overflow bug.
 	SkBitmap Bitmap;
 	SkPaint Paint;
 	VanillaInt Width;
 	VanillaInt Height;
-	VanillaPortGraphics PortGraphics;
-	~VGraphics() {
-		//delete this->Canvas;
-		//delete this->Paint;
-		//delete this->Bitmap;
-	}
-	VGraphics(){
-		//memset(this->Buffers, 0, sizeof(this->Buffers));
-	}
+#elif defined DRAW_GDI
+	void *graphics;//图形
+	HDC hdc;
+	HBITMAP HBitmap;
+#endif
 }*VanillaGraphics, _VGraphics;
-
+/*文本格式*/
 typedef struct VStringFormat
 {
+	VanillaColor TextColor;
+	VanillaColor ShadowColor;
+#ifdef DRAW_SKIA
 	SkTypeface* Typeface;
 	SkTextBox::SpacingAlign VAlign;
 	SkPaint::Align Align;
 	SkTextBox::Mode LineMode;
-	VanillaColor Color;
-	VanillaColor Shadow;
 	VanillaInt Style;
 	SkScalar Size;
 	static SkMaskFilter* BlurMaskFilter;
+#elif defined DRAW_GDI
+	void *font;//字体
+	void *StringFormat;//文本格式
+	void *FontFamily;//字体族
+	void *BrushShadow;
+	void *Brush;
+#endif
 }*VanillaStringFormat, _VStringFromat;
+
+VanillaBool VanillaInitDrawing();
 
 /**
 * 此函数用作填充一个矩形区域.
@@ -105,7 +127,7 @@ VAPI(VanillaVoid) VanillaDrawRect(VanillaGraphics Graphics, VanillaColor Color, 
 * @此函数没有返回值.
 */
 VAPI(VanillaVoid) VanillaDrawString(VanillaGraphics Graphics, VanillaStringFormat StringFormat, VanillaText String, VanillaRect Rect);
-VAPI(VanillaVoid) VanillaCreateRoundRectPath(VanillaInt x, VanillaInt y, VanillaInt Width, VanillaInt Height, VanillaReal Round, SkPath* Path);
+//VAPI(VanillaVoid) VanillaCreateRoundRectPath(VanillaInt x, VanillaInt y, VanillaInt Width, VanillaInt Height, VanillaReal Round, SkPath* Path);
 /**
 * 此函数用作绘制并填充圆角矩形.
 * @param Graphics VanillaGraphics对象
@@ -240,5 +262,8 @@ VAPI(VanillaImage) VanillaLoadImageFromBinary(VanillaBin Binary);
 * @此函数没有返回值.
 */
 VAPI(VanillaVoid) VanillaDestroyImage(VanillaImage Image);
+#ifdef DRAW_SKIA
 SkTypeface* VanillaPortCreateSkTypeface(VanillaText FontName, SkTypeface::Style Style);
+#endif
+
 #endif	//__VANILLA_CORE_DRAWING_H__

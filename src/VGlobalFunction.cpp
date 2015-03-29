@@ -5,10 +5,14 @@
 #include "VWindow.h"
 #include "VControl.h"
 #include "VPort.h"
+#include "VDrawing.h"
 #include "VGlobalFunction.h"
 
 VanillaBool VInit() {
-	if (!VanillaPortInitializeX()) {
+	if (!VanillaPortInitialize()) {
+		return false;
+	}
+	if (!VanillaInitDrawing()){
 		return false;
 	}
 	return true;
@@ -54,9 +58,9 @@ VAPI(VanillaBool) VanillaIsPointInRect(VanillaInt x, VanillaInt y, VanillaRect R
 }
 
 VAPI(VanillaBool) VanillaIntersectRect(VanillaRect Rect1, VanillaRect Rect2, VanillaRect RectResult) {
-	RectResult->Left = std::max(Rect1->Left, Rect2->Left);
-	RectResult->Top = std::max(Rect1->Top, Rect2->Top);
-	RectResult->Width = std::min(Rect1->Left + Rect1->Width, Rect2->Left + Rect2->Width) - RectResult->Left;
-	RectResult->Height = std::min(Rect1->Top + Rect1->Height, Rect2->Top + Rect2->Height) - RectResult->Top;
+	RectResult->Left = max(Rect1->Left, Rect2->Left);
+	RectResult->Top = max(Rect1->Top, Rect2->Top);
+	RectResult->Width = min(Rect1->Left + Rect1->Width, Rect2->Left + Rect2->Width) - RectResult->Left;
+	RectResult->Height = min(Rect1->Top + Rect1->Height, Rect2->Top + Rect2->Height) - RectResult->Top;
 	return (RectResult->Width > 0) && (RectResult->Height > 0);
 }
