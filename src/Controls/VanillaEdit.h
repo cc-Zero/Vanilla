@@ -12,6 +12,8 @@ typedef struct VEdit
 	VanillaStringFormat StringFormat;//字体格式
 	VanillaColor FrameColor;//边框颜色
 	VanillaColor FireColor;//点燃颜色
+
+	VanillaTimer GradientTimer;		//光标时钟
 } *VanillaEdit, _VEdit;
 
 VAPI(VanillaControl) VanillaEditCreate(VanillaControl ParentControl, VanillaInt Left, VanillaInt Top, VanillaInt Width, VanillaInt Height, VanillaText String, VanillaStringFormat StringFormat, VanillaBool Visible, VanillaBool Enabled);
