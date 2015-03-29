@@ -56,7 +56,7 @@ VAPI(int) VanillaPortUTF8ToUTF16(wchar_t* Output, int OutputSize, char* Input, i
 * 此函数用作初始化X-Client连接.
 * @param Returns 成功返回true.
 */
-VanillaBool VanillaPortInitializeX();
+VanillaBool VanillaPortInitialize();
 /**
 * 此函数用作创建VanillaPortWindow对象.
 * @param Rect 窗口矩形

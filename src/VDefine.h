@@ -2,15 +2,16 @@
 #define __VANILLA_CORE_DEFINE_H__
 // Vanilla Defines
 
+#include <stdint.h>
 #define DEBUG_BORDER 0
 #define DEBUG_PUTPNG(BITMAP, FILE) SkASSERT(SkImageEncoder::EncodeFile(FILE, BITMAP, SkImageEncoder::kPNG_Type, 100));
 
 
 /*±‡“Î≈‰÷√*/
 //‰÷»æ∫Û∂À
-#define DRAW_SKIA
+//#define DRAW_SKIA
 //#define DRAW_AGG
-//#define DRAW_GDI
+#define DRAW_GDI
 //#define DRAW_CAIRO
 
 
@@ -66,7 +67,7 @@ typedef struct VSizeR *VanillaSizeR, _VSizeR;
 
 typedef struct VImage *VanillaImage, _VImage;
 
-typedef SkColor VanillaColor;
+typedef uint32_t VanillaColor;
 
 typedef struct VGraphics  *VanillaGraphics, _VGraphics;
 

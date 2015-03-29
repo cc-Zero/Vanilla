@@ -60,6 +60,7 @@ VAPI(VanillaControl) VanillaButtonCreate(VanillaControl ParentControl, VanillaIn
 			p->Style = 0;
 			p->StringFormat = StringFormat;
 			p->Title = new VanillaString(Title);
+			Control->Alpha = 100;
 			return Control;
 		}
 	}

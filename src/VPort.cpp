@@ -271,7 +271,7 @@ VAPI(VanillaInt) VanillaPortUTF8ToUTF16(wchar_t* Output, VanillaInt OutputSize, 
 	return resultsize;
 }
 
-VanillaBool VanillaPortInitializeX() {
+VanillaBool VanillaPortInitialize() {
 #ifdef WIN32
 	return true;
 #elif defined LINUX
