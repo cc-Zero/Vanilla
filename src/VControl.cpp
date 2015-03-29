@@ -150,10 +150,10 @@ VAPI(VanillaVoid) VanillaControlGradient(VanillaControl Control, VanillaInt dwTi
 	if (Control->Graphics_Gradient2 == 0){ Control->Graphics_Gradient2 = VanillaCreateGraphicsInMemory(Control->CRect.Width, Control->CRect.Height); }
 	if (Control->Gradienting)
 	{
-		VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
+		VanillaAlphaBlend(Control->Graphics, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
 	}
 	/*保存旧图形到缓存2*/
-	VanillaAlphaBlend(Control->Graphics_Gradient2, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics, 0, 0, Control->Alpha);
+	VanillaAlphaBlend(Control->Graphics_Gradient2, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics, 0, 0, Control->Alpha);
 	/*重绘到渐变缓存1*/
 	VanillaGraphicsClear(Control->Graphics_Gradient1, 0);
 	Control->CtlProc(Control->ID, VM_PAINT, NULL, (VanillaInt)Control->Graphics_Gradient1);
@@ -426,21 +426,21 @@ VanillaInt VanillaDefaultControlProc(VanillaControl Control, VanillaInt Message,
 				if (Control->GradientAlpha > 255){ Control->GradientAlpha = 255; }//透明度最多255
 				if (Control->GradientType){
 					//在旧的缓存图形上慢慢增加不透明度覆盖绘制新的图像(模拟SyserUI工作方式)
-					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255);
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics_Gradient2, 0, 0, 255);
 				}
 				else
 				{
 					//慢慢增加新图像的不透明度,减少就图像的不透明度(模拟Ex_DirectUI2.0工作方式)
 					VanillaGraphicsClear(Control->Graphics, 0);
-					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient2, 0, 0, 255 - (VanillaByte)Control->GradientAlpha);
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics_Gradient2, 0, 0, 255 - (VanillaByte)Control->GradientAlpha);
 				}
-				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, (VanillaByte)Control->GradientAlpha);
+				VanillaAlphaBlend(Control->Graphics, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics_Gradient1, 0, 0, (VanillaByte)Control->GradientAlpha);
 				/*刷新缓存*/
 				/*刷新显示*/
 				VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
 				if (Control->GradientAlpha == 255)
 				{
-					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->Rect.Width, Control->Rect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
+					VanillaAlphaBlend(Control->Graphics, 0, 0, Control->CRect.Width, Control->CRect.Height, Control->Graphics_Gradient1, 0, 0, Control->Alpha);
 					VanillaDefaultControlProc(Control, VM_UPDATE, 0, 0);
 					/*销毁时钟*/
 					VanillaPortestroyTimer(Control->GradientTimer);

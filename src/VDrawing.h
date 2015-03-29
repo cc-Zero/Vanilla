@@ -45,13 +45,13 @@ typedef struct VPortGraphics
 /*图形*/
 typedef struct VGraphics {
 	VanillaPortGraphics PortGraphics;
+	VanillaInt Width;
+	VanillaInt Height;
 #ifdef DRAW_SKIA
 	SkCanvas Canvas;
 	char Buffers[8]; // fixme : Skia's memory-overflow bug.
 	SkBitmap Bitmap;
 	SkPaint Paint;
-	VanillaInt Width;
-	VanillaInt Height;
 #elif defined DRAW_GDI
 	void *graphics;//图形
 	HDC hdc;
@@ -193,6 +193,19 @@ VAPI(VanillaVoid) VanillaDrawImage(VanillaGraphics Graphics, VanillaImage Image,
 */
 VAPI(VanillaVoid) VanillaDrawImageEx(VanillaGraphics Graphics, VanillaImage Image, VanillaInt x, VanillaInt y, VanillaInt Width, VanillaInt Height, VanillaInt xSrc, VanillaInt ySrc, VanillaInt WidthSrc, VanillaInt HeightSrc, VanillaByte Alpha);
 VAPI(VanillaVoid) VanillaAlphaBlendEx(VanillaGraphics Dest, VanillaInt x, VanillaInt y, VanillaInt Width, VanillaInt Height, VanillaGraphics Src, VanillaInt xSrc, VanillaInt ySrc, VanillaInt WidthSrc, VanillaInt HeightSrc, VanillaByte Alpha);
+/**
+* 此函数用作以透明通道复制图形.
+* @param Dest 目标图形
+* @param x 左边
+* @param y 顶边
+* @param Width 宽度
+* @param Height 高度
+* @param Src 源图形
+* @param xSrc 源坐标
+* @param ySrc 源顶边
+* @param Alpha 透明度
+* @此函数没有返回值.
+*/
 VAPI(VanillaVoid) VanillaAlphaBlend(VanillaGraphics Dest, VanillaInt x, VanillaInt y, VanillaInt Width, VanillaInt Height, VanillaGraphics Src, VanillaInt xSrc, VanillaInt ySrc, VanillaByte Alpha);
 /**
 * 此函数用作使用指定颜色清空VanillaGraphics对象.

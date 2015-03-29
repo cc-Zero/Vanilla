@@ -9,9 +9,9 @@
 
 /*编译配置*/
 //渲染后端
-#define DRAW_SKIA
+//#define DRAW_SKIA
 //#define DRAW_AGG
-//#define DRAW_GDI
+#define DRAW_GDI
 //#define DRAW_CAIRO
 
 

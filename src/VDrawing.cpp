@@ -296,7 +296,7 @@ VAPI(VanillaVoid) VanillaAlphaBlend(VanillaGraphics Dest, VanillaInt x, VanillaI
 	bf.BlendFlags = 0;
 	bf.AlphaFormat = 1;
 	bf.SourceConstantAlpha = Alpha;
-	BOOL a=AlphaBlend(Dest->hdc, x, y, Width, Height, Src->hdc, xSrc, ySrc, Width, Height, bf);
+	AlphaBlend(Dest->hdc, x, y, Width, Height, Src->hdc, xSrc, ySrc, (Src->Width < Width) ? Width : Src->Width, (Src->Height < Height) ? Height : Src->Height, bf);
 #endif
 
 }
@@ -401,17 +401,16 @@ VAPI(VanillaVoid) VanillaDestroyStringFormat(VanillaStringFormat StringFormat) {
 }
 
 VAPI(VanillaGraphics) VanillaCreateGraphicsInMemory(VanillaInt Width, VanillaInt Height) {
-#ifdef DRAW_SKIA
-	VanillaGraphics Graphics = new VGraphics;
-	Graphics->Bitmap.allocPixels(SkImageInfo::Make(Width, Height, kBGRA_8888_SkColorType, kPremul_SkAlphaType));
-	new (&Graphics->Canvas) SkCanvas(Graphics->Bitmap);
-	Graphics->Width = Width;
-	Graphics->Height = Height;
-	return Graphics;
-#elif defined DRAW_GDI
 	VanillaGraphics Graphics = (VanillaGraphics)malloc(sizeof(VGraphics));
 	if (!Graphics){ return NULL; }
 	memset(Graphics, 0, sizeof(VGraphics));
+	Graphics->Width = Width;
+	Graphics->Height = Height;
+#ifdef DRAW_SKIA
+	Graphics->Bitmap.allocPixels(SkImageInfo::Make(Width, Height, kBGRA_8888_SkColorType, kPremul_SkAlphaType));
+	new (&Graphics->Canvas) SkCanvas(Graphics->Bitmap);
+	return Graphics;
+#elif defined DRAW_GDI
 	
 	Graphics->hdc = CreateCompatibleDC(NULL);
 	BITMAPINFO BitmapInfo;
@@ -462,14 +461,14 @@ VAPI(VanillaGraphics) VanillaCreateGraphicsOfWindow(VanillaWindow Window) {
 
 		HBITMAP OldBitmap = (HBITMAP)SelectObject(MemoryDC, (HGDIOBJ)HBitmap);
 
+		Graphics->Width = Window->Rect.Width;
+		Graphics->Height = Window->Rect.Height;
 #ifdef DRAW_SKIA
 		Graphics->Bitmap.installPixels(SkImageInfo::MakeN32Premul(Window->Rect.Width, Window->Rect.Height), Bits, ((Window->Rect.Width * 32 + 15) / 16) * 2);
 		new (&Graphics->Canvas) SkCanvas(Graphics->Bitmap);
 		Graphics->PortGraphics = new VPortGraphics;
 		Graphics->PortGraphics->MemoryDC = MemoryDC;
 		Graphics->PortGraphics->CurrentBitmap = HBitmap;
-		Graphics->Width = Window->Rect.Width;
-		Graphics->Height = Window->Rect.Height;
 		Graphics->PortGraphics->OldBitmap = OldBitmap;
 #elif defined DRAW_GDI
 		Graphics->hdc = MemoryDC;
